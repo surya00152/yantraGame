@@ -93,7 +93,7 @@ class AdminController extends AbstractActionController
         }
         
         $currentTime = $this->userPlugin()->getAppService()->getRealTime();
-        $drawTime = $this->userPlugin()->getAppService()->getDrawTime();
+        $drawTime = $this->userPlugin()->getAppService()->getDrawTime($currentTime);
         $drawDate = $this->userPlugin()->getAppService()->getDate();
         
         if (empty($drawTime)) {
@@ -106,6 +106,7 @@ class AdminController extends AbstractActionController
         $drowDateTime = strtotime($drawDate.' '.$myDrawTime);
         $differenceInSeconds = $drowDateTime - $currentDateTime;
         $differenceInSeconds = date('i:s',$differenceInSeconds);
+        
         if (empty($drawTime)) {
             $drawTime = '00:00:00';
         }
@@ -585,7 +586,7 @@ class AdminController extends AbstractActionController
         //Get post value from html form.
         $post = $this->getRequest()->getPost();
         
-        $post['startDate'] = '14-02-2015';//!empty($post['startDate'])?$post['startDate']:$this->userPlugin()->getAppService()->getDate();
+        $post['startDate'] = !empty($post['startDate'])?$post['startDate']:$this->userPlugin()->getAppService()->getDate();
         $post['endDate'] = !empty($post['endDate'])?$post['endDate']:$this->userPlugin()->getAppService()->getDate();
         
         if (count($post) > 0) {                           

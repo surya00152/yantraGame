@@ -75,7 +75,7 @@ class Transaction implements ServiceManagerAwareInterface {
      */
     public function getAdminTransactionDaywiseReport($adminId = 1,$startDate,$endDate) {
         $qb = $this->entityManager->createQueryBuilder();
-        return $qb->select("dt.drawDate,(SELECT SUM(tc.transBalance) FROM ".self::ENTITY." tc WHERE tc.transType = 'Credit' AND (tc.agentId=1 OR tc.userId=1) GROUP BY dt.drawDate ) as creditBal,(SELECT SUM(td.transBalance) FROM ".self::ENTITY." td WHERE td.transType = 'Debit' AND (td.agentId=1 OR td.userId=1) GROUP BY dt.drawDate) as debitBal")
+        return $qb->select("dt.drawDate,(SELECT SUM(tc.transBalance) FROM ".self::ENTITY." tc WHERE tc.transType = 'Credit' AND tc.dateId = dt.Id AND (tc.agentId=1 OR tc.userId=1) GROUP BY dt.drawDate ) as creditBal,(SELECT SUM(td.transBalance) FROM ".self::ENTITY." td WHERE td.transType = 'Debit' AND td.dateId = dt.Id AND (td.agentId=1 OR td.userId=1) GROUP BY dt.drawDate) as debitBal")
                 ->from(self::ENTITY, 't')
                 ->leftJoin(self::USERENTITY, 'ul','with', 't.userId = ul.Id')
                 ->leftJoin(self::USERENTITY, 'ug','with', 't.agentId = ug.Id')
@@ -86,6 +86,7 @@ class Transaction implements ServiceManagerAwareInterface {
                 ->groupBy('dt.drawDate')
                 ->getQuery()
                 ->getArrayResult();
+    
     }
     
     /**

@@ -30,8 +30,8 @@ echo $this->headScript()
                             <thead>
                                 <tr>
                                     <th>Transaction Date</th>
-                                    <th>Reject Cheaps</th>
-                                    <th>Accept Cheaps</th>
+                                    <th>Given Chips</th>
+                                    <th>Revers Chips</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -41,8 +41,8 @@ echo $this->headScript()
                                         ?>
                                         <tr>
                                             <td><?=$report['drawDate']?></td>
-                                            <td><?=$report['debitBal']?></td>
-                                            <td><?=$report['creditBal']?></td>
+                                            <td><?=!empty($report['creditBal'])?$report['creditBal']:0?></td>
+                                            <td><?=!empty($report['debitBal'])?$report['debitBal']:0?></td>                                            
                                         </tr>
                                         <?php
                                     }

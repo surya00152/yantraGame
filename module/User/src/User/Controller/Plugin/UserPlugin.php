@@ -1172,7 +1172,7 @@ class UserPlugin extends AbstractPlugin
                             'reqFrom' => $userData['Id'],
                             'reqTo' => $localUserData['Id'],
                             'requestedName' => $userData['name'],
-                            'message' => 'chips recieve : '.$localUserData['balReq'],
+                            'message' => 'Reject chips : '.$localUserData['balReq'].' success',
                             'date' => $this->getAppService()->getDateTime()
                         );                            
                         //set notification message

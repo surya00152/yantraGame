@@ -29,8 +29,8 @@ echo $this->headScript()
                             <thead>
                                 <tr>
                                     <th>Transfer To Name</th>
-                                    <th>Transfer Type</th>
-                                    <th>Transfer Balance</th>
+                                    <th>Given Chips</th>
+                                    <th>Revers Chips</th>
                                     <th>Transfer Time</th>
                                 </tr>
                             </thead>
@@ -41,8 +41,8 @@ echo $this->headScript()
                                         ?>
                                         <tr>
                                             <td><?php echo !empty($report['Lname'])?$report['Lname']:$report['Aname'];?></td>
-                                            <td><?php echo ($report['transType']=='Credit')?'Debit':'Credit'; ?></td>
-                                            <td><?=$report['transBalance']?></td>
+                                            <td><?php echo ($report['transType']=='Credit')?$report['transBalance']:'0'; ?></td>
+                                            <td><?php echo ($report['transType']=='Debit')?$report['transBalance']:'0'; ?></td>
                                             <td><?=date('h:i a',strtotime($report['time']))?></td>
                                         </tr>
                                         <?php

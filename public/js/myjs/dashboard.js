@@ -49,13 +49,25 @@ $(document).ready(function() {
     });    
 });
 
-function refreshTable() {
+function refreshTable(ele) {
+    $(ele).attr('disabled',true);
     //Refresh Table
     $.ajax({
         url: '/public/admin/dashboard',
         type: 'GET',
         success: function(data)
         {
+            $('#totalQnt').html('0');
+            $('#totalPrice').html('0');            
+            for (i=1;i<=10;i++) {
+                $('#PL-'+i).html('0');
+                $('#jackpotPL-'+i).html('0');
+                $('#quantity-'+i).html('0');
+                $('#winPrice-'+i).html('0');
+                $('#jackpotWinPrice-'+i).html('0');
+                $('#price-'+i).html('0');
+                
+            }
             arrayIndex = [];
             var json = jQuery.parseJSON(data);
             if (Object.keys(json.data).length > 0) {
@@ -69,6 +81,7 @@ function refreshTable() {
             for (i=1;i<=10;i++) {
                 if (typeof arrayIndex[i] == 'undefined') {
                     $('#PL-'+i).html(json.totalPrice);
+                    $('#jackpotPL-'+i).html(json.totalPrice);
                 }
             }            
             $('#totalQnt').html(json.totalQnt);
@@ -77,9 +90,11 @@ function refreshTable() {
             clearInterval(interval);
             startTimer();
             //CounterInit(json.remainigTime);
+            $(ele).attr('disabled',false);
         },
         error: function(jqXHR, textStatus, errorThrown)
         {
+            $(ele).attr('disabled',false);
             alert('Table refresh fail.Please try again.');
         }
     });

@@ -1,6 +1,6 @@
 <?php
 echo $this->headScript()
-        ->appendFile($this->basePath() . '/js/myjs/purchaseReport.js')
+        ->appendFile($this->basePath() . '/js/myjs/plReports.js')
 ?>
 <div id="page-wrapper">
     <div class="row">
@@ -34,6 +34,7 @@ echo $this->headScript()
                                     <th style="width: 8%;">Purchase</th>
                                     <th style="width: 10%;">Win Price</th>
                                     <th style="width: 5%;">P/L</th>
+                                    <th style="width: 5%;">Id</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -48,6 +49,7 @@ echo $this->headScript()
                                             <td><?=$report['purchase']?></td>
                                             <td><?=$report['winPrice']?></td>
                                             <td><?=$report['pl']?></td>
+                                            <td><?=$report['Id']?></td>
                                        </tr>
                                         <?php
                                     }

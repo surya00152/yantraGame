@@ -3,7 +3,6 @@
 $this->layout('layout/empty');
 
 echo $this->headLink()
-        ->appendStylesheet($this->basePath() . '/css/example.css')
         ->appendStylesheet($this->basePath() . '/css/jquery.countdown.timer.css');
 
 echo $this->headScript()
@@ -54,7 +53,7 @@ echo $this->headScript()
             <?php echo $remainigTime; ?>
         </h1>
         <div class="pull-right" style="margin-top:-87px;">
-            <button onclick="refreshTable()" class="btn btn-warning btn-lg pull-left" style="margin-top: 37px;margin-bottom: 18px;margin-right:21px;">
+            <button onclick="refreshTable(this)" class="btn btn-warning btn-lg pull-left" style="margin-top: 37px;margin-bottom: 18px;margin-right:21px;">
                 Refresh
             </button>
             <a class="btn btn-primary btn-lg pull-right" href="<?php echo $this->basePath()?>/admin/showDrawYantra" target="_new" style="margin-top: 37px;margin-bottom: 18px;">
@@ -154,16 +153,16 @@ echo $this->headScript()
                 </tr>
                 <tr style="color: red;">
                     <td>Jack P/L</td>
-                    <th id="jackpotPL-1"><?php echo isset($rate[1])?$rate[1]['jackpotPL']:0; ?></th>
-                    <th id="jackpotPL-2"><?php echo isset($rate[2])?$rate[2]['jackpotPL']:0; ?></th>
-                    <th id="jackpotPL-3"><?php echo isset($rate[3])?$rate[3]['jackpotPL']:0; ?></th>
-                    <th id="jackpotPL-4"><?php echo isset($rate[4])?$rate[4]['jackpotPL']:0; ?></th>
-                    <th id="jackpotPL-5"><?php echo isset($rate[5])?$rate[5]['jackpotPL']:0; ?></th>
-                    <th id="jackpotPL-6"><?php echo isset($rate[6])?$rate[6]['jackpotPL']:0; ?></th>
-                    <th id="jackpotPL-7"><?php echo isset($rate[7])?$rate[7]['jackpotPL']:0; ?></th>
-                    <th id="jackpotPL-8"><?php echo isset($rate[8])?$rate[8]['jackpotPL']:0; ?></th>
-                    <th id="jackpotPL-9"><?php echo isset($rate[9])?$rate[9]['jackpotPL']:0; ?></th>
-                    <th id="jackpotPL-10"><?php echo isset($rate[10])?$rate[10]['jackpotPL']:0; ?></th>
+                    <th id="jackpotPL-1"><?php echo isset($rate[1])?$rate[1]['jackpotPL']:$totalRate['totalPrice']; ?></th>
+                    <th id="jackpotPL-2"><?php echo isset($rate[2])?$rate[2]['jackpotPL']:$totalRate['totalPrice']; ?></th>
+                    <th id="jackpotPL-3"><?php echo isset($rate[3])?$rate[3]['jackpotPL']:$totalRate['totalPrice']; ?></th>
+                    <th id="jackpotPL-4"><?php echo isset($rate[4])?$rate[4]['jackpotPL']:$totalRate['totalPrice']; ?></th>
+                    <th id="jackpotPL-5"><?php echo isset($rate[5])?$rate[5]['jackpotPL']:$totalRate['totalPrice']; ?></th>
+                    <th id="jackpotPL-6"><?php echo isset($rate[6])?$rate[6]['jackpotPL']:$totalRate['totalPrice']; ?></th>
+                    <th id="jackpotPL-7"><?php echo isset($rate[7])?$rate[7]['jackpotPL']:$totalRate['totalPrice']; ?></th>
+                    <th id="jackpotPL-8"><?php echo isset($rate[8])?$rate[8]['jackpotPL']:$totalRate['totalPrice']; ?></th>
+                    <th id="jackpotPL-9"><?php echo isset($rate[9])?$rate[9]['jackpotPL']:$totalRate['totalPrice']; ?></th>
+                    <th id="jackpotPL-10"><?php echo isset($rate[10])?$rate[10]['jackpotPL']:$totalRate['totalPrice']; ?></th>
                     <td>-</td>
                 </tr>                
             </tbody>
