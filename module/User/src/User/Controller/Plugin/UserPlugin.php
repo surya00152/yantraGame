@@ -634,10 +634,15 @@ class UserPlugin extends AbstractPlugin
                     
                     if(count($ticketData) > 0) {
                         foreach($ticketData as $tKey => $ticket) {
-                            $jackpot = ($ticket['jackpot'] == 1) ? 0 : $ticket['jackpot'];
-                            $ticketData[$tKey]['symbol'] = $ticket['yantraId']."-Jackpot:".$jackpot;                            
-                            unset($ticketData[$tKey]['yantraId']);
-                            unset($ticketData[$tKey]['jackpot']);
+                            
+                            $drawYantra = $this->getDrowModel()->drowExistByDateTime($ticket['date'].' '.$ticket['showTime']);
+                            if (count($drawYantra) > 0) {
+                                $jackpot = ($drawYantra[0]['jackpot'] == 1)?0:$drawYantra[0]['jackpot'];
+                                $symbol = $drawYantra[0]['yantraId']."-Jackpot:".$jackpot;
+                            } else {
+                                $symbol = 'closed';
+                            }
+                            $ticketData[$tKey]['symbol'] = $symbol;
                         }
                     }
                     $response['data'] = $ticketData;

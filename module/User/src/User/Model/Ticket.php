@@ -175,15 +175,16 @@ class Ticket implements ServiceManagerAwareInterface {
      */
     public function getShowwiseReport($userId,$date) {
         $qb = $this->entityManager->createQueryBuilder();
-        return $qb->select("dt.drawDate as date,t.time as showTime,SUM(t.totalPrice) as purchase,SUM(t.totalWin) as win,dy.yantraId,dy.jackpot")
+        return $qb->select("dt.drawDate as date,t.time as showTime,SUM(t.totalPrice) as purchase,SUM(t.totalWin) as win")
                 ->from(self::ENTITY, 't')
                 ->leftJoin(self::DATEENTITY, 'dt','with', 'dt.Id = t.dateId')
-                ->leftJoin(self::DRAWENTITY, 'dy','with', 'dy.yantraId = t.yantraId')
+                //->leftJoin(self::DRAWENTITY, 'dy','with', 'dy.drawTime = dt.drawDate +  t.time')
                 ->where('dt.drawDate ='.$qb->expr()->literal($date))
                 ->andWhere('dt.userId ='.$userId)
-                ->andWhere("dy.drawTime = CONCAT(CONCAT(dt.drawDate,' '),t.time)")
+                //->andWhere("dy.drawTime = CONCAT(CONCAT(dt.drawDate,' '),t.time)")
                 ->groupBy('t.time')
                 ->getQuery()
+                //->getSQL();
                 ->getArrayResult();
     }
     
