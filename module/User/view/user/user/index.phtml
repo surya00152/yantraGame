@@ -1,0 +1,155 @@
+<?php
+// Set java scripts
+$this->headScript()
+        ->appendFile('/Validation/js/jquery.validate.min.js')
+        ->appendFile('/js/address_add.js');
+?>
+<!--------CONTACT DETAILS POPUP----------------->
+<div id="contactDetails" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div id="loaderContactDetails" class="loaderpopup" style="display:none;"></div>
+    <form id="contactfrm" name="contactfrm" method="post" action="" class="form-horizontal" style="margin:0;" enctype="multipart/form-data">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <!--<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>-->
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h3 class="modal-title" id="myModalLabel">Add New Contact Details</h3>
+                </div><!--modal-header-->
+
+                <div class="modal-body">
+                    <input type="hidden" name="viewStatus" value="show">
+                    <div class="container">
+                        <div class="alert alert-error jspopupalert-error" style="display:none">                
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="contact-step-1" class="col-md-12">
+                                <div class="col-md-8 ">
+                                    <div id="ShowErrorMessage" style="margin-left: 90px;"></div>
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label" for="inputEmail">Email</label>
+                                        <div class="col-sm-7">
+                                            <input title="Email OR Phone Required. If we recognize this user's email, we'll prepopulate the contact info for you." type="text" id="email" class="form-control mygroup"  name="email" placeholder="Email">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label" for="inputEmail">Contact No</label> 
+                                        <div class="col-sm-7">
+                                            <input title="Email OR Phone Required. If we recognize this user's phone, we'll prepopulate the contact info for you." type="text" id="phoneSMS" class="form-control mygroup" name="phoneSMS" placeholder="Contact No">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label" for="inputEmail">Name</label>
+                                        <div class="col-sm-7">
+                                            <input title="Firstname only, or Firstname Lastname" type="text" id="firstName" class="form-control" name="firstName" placeholder="First Name">
+                                        </div>
+                                    </div>     
+                                </div>
+                                <div class="col-md-4">
+                                    <img src="/images/user_default.png" id="ImageUpload" class="img-rounded1" title="Click to upload Image" name="image" alt="Smiley face" height="100px" width="100px" style="cursor:pointer;">
+                                    <input type="file" class="hidden" id="file" name="file" placeholder="select file">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="col-sm-3"></label>
+                                <div class="col-sm-">
+                                    <label id="contactStep" style="color: lightgray;cursor: pointer;">Add more details on the next step...</label>
+                                </div>
+                            </div>
+                            <div id="contact-step-2" class="col-md-12 " style="display: none">
+                                <div class="col-md-8 ">                                
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label" for="inputEmail">City</label>
+                                        <div class="col-sm-7">
+                                            <input title="City" type="text" id="city" class="form-control"  name="city" placeholder="City">
+                                        </div>
+                                    </div>
+                                </div> 
+                                <div class="col-md-8 ">                                
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label" for="inputEmail">State</label>
+                                        <div class="col-sm-7">
+                                            <input title="State" type="text" id="state" class="form-control"  name="state" placeholder="State">
+                                        </div>
+                                    </div>
+                                </div> 
+                                <div class="col-md-8 ">                                
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label" for="inputEmail">Country</label>
+                                        <div class="col-sm-7">
+                                            <select title="Country" name="Country" id="Country" style="max-width:200px;">
+                                                <option value="">Please, select Country<b></b></option>
+                                                <?php
+                                                $conutryList = $this->userHelper()->getCoutryList();
+                                                if (isset($conutryList) && !empty($conutryList)) {
+                                                    foreach ($conutryList as $country) {
+                                                        echo '<option value="' . $country['nicename'] . '">' . $country['nicename'] . '</option>';
+                                                    }
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div> 
+                                <div class="col-md-8 ">                                
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label" for="inputEmail">TimeZone</label>
+                                        <div class="col-sm-7">
+                                            <select  title="TimeZone" name="timeZone" id="timeZone" class="col-sm-12" style="max-width:200px;">
+                                                <option value="">Please, select timezone</option>
+                                                <?php
+                                                foreach ($this->userHelper()->timezoneList() as $key => $t) {
+                                                    echo "<option value='$key'>$t</option>";
+                                                }
+                                                ?> 
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div>                            
+                        </div>  
+                    </div>
+                </div><!--modal-body-->
+
+                <div class="modal-footer">
+                    <label id="saveContact" class="btn btn-flat btn-orange">
+                        <i class="icon-ok"></i>
+                        <input type="submit"  name="Save" value="Save" data-target="#contactDetails" class="btn-sub btn-modal" title="Save contact Details"/>
+                    </label>
+
+                    <label id="updateContact" class="btn btn-flat btn-red">
+                        <i class="icon-ok"></i>
+                        <input type="submit" name="Update" value="Update" data-target="#contactDetails" class="btn-sub btn-modal" title="Update contact Details"/>
+                    </label>
+
+                    <a class="btn btn-default btn-flat pull-left" data-dismiss="modal" aria-hidden="true" title="Close Popup"><i class="icon-remove"></i> Close</a>
+                </div><!--modal-footer-->
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </form>
+</div>
+<!------------------------------------------------------------------------------------------------------------------->
+<style>
+    .img-rounded1{
+        border-radius: 6px;
+    }
+</style>
+<script>
+    $(document).ready(function() {
+        $("#contactStep").click(function() {
+            if ($("#contact-step-2").is(":visible")) {
+                $("#contact-step-2").hide();
+                $(this).text('Add more details on the next step...');
+            }
+            else
+            {
+                $("#contact-step-2").show();
+                $(this).text('Hide Details.');
+            }
+        });
+    });
+</script>
