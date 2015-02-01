@@ -28,7 +28,11 @@ class ApiPlugin extends AbstractPlugin
         'getPurchaseReport',
         'getDaywiseReport',
         'getShowwiseReport',
-        'changePassword'
+        'changePassword',
+        'transferBalance',
+        'sendTransferCode',
+        'getNotification',
+        'transactionReport'
     );
 
     /*
@@ -90,6 +94,18 @@ class ApiPlugin extends AbstractPlugin
                 break;
             case 'changePassword':
                 $response = $this->getController()->userPlugin()->changePassword($post);
+                break;
+            case 'transferBalance':
+                $response = $this->getController()->userPlugin()->transferBalance($post);
+                break;
+            case 'sendTransferCode':
+                $response = $this->getController()->userPlugin()->sendTransferCode($post);
+                break;
+            case 'getNotification':
+                $response = $this->getController()->userPlugin()->getNotification($post);
+                break;
+            case 'transactionReport':
+                $response = $this->getController()->userPlugin()->transactionReport($post);
                 break;
             default :
                 $response['status'] = 'error';

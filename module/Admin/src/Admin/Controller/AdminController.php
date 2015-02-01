@@ -62,5 +62,53 @@ class AdminController extends AbstractActionController
         }
     }
     
+    /*
+     * User local
+     */
+    public function localUsersAction()
+    {
+        if (!$this->adminPlugin()->isAdminLogin()) {
+            return $this->redirect()->toUrl('/public/admin/login');
+        }
+        //Get local user Details
+        $data['localUser'] = $this->userPlugin()->getUserModel()->getUserByRoll('local');
+        
+        return new ViewModel($data);
+    }
+    
+    /*
+     * User agent
+     */
+    public function agentUsersAction()
+    {
+        if (!$this->adminPlugin()->isAdminLogin()) {
+            return $this->redirect()->toUrl('/public/admin/login');
+        }
+        //Get local user Details
+        $data['agentUser'] = $this->userPlugin()->getUserModel()->getUserByRoll('agent');
+        
+        return new ViewModel($data);
+    }
+    
+    /*
+     * Local User Purchase report
+     */
+    public function purchaseReportAction()
+    {
+        exit('PENDING');
+        if (!$this->adminPlugin()->isAdminLogin()) {
+            return $this->redirect()->toUrl('/public/admin/login');
+        }
+        
+        $post = array (
+            'userId' => '',
+        );
+        //Get Purchase report By UserId
+        $data['purchaseReport'] = $this->userPlugin()->getUserByRoll('agent');
+        
+        return new ViewModel($data);
+    }
+    
+    
     
 }

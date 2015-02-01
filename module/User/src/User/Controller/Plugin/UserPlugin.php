@@ -44,6 +44,24 @@ class UserPlugin extends AbstractPlugin
     }
     
     /*
+     * Get Notification Model
+     */
+
+    public function getNotificationModel()
+    {
+        return $this->getController()->getServiceLocator()->get('User\Model\Notification');
+    }
+    
+     /*
+     * Get Transaction Model
+     */
+
+    public function getTransactionModel()
+    {
+        return $this->getController()->getServiceLocator()->get('User\Model\Transaction');
+    }
+    
+    /*
      * Get Ticket Model
      */
 
@@ -211,7 +229,7 @@ class UserPlugin extends AbstractPlugin
         $response = array();
 
         //check phone No exist or not
-        $userData = $this->getUserModel()->getUserByPhoneNo($post['phoneNo']);
+        $userData = $this->getUserModel()->getLocalUserByPhoneNo($post['phoneNo']);
 
         if (count($userData) > 0) {
                      
@@ -325,9 +343,7 @@ class UserPlugin extends AbstractPlugin
 
         //Get user details By token
         $userData = $this->getUserModel()->getUserByToken($post['token']);
-        
-        
-        
+              
         if (count($userData) > 0) {
             //check User Roll.
             if ($userData['userRoll'] == 'local') {
@@ -361,16 +377,36 @@ class UserPlugin extends AbstractPlugin
 
     public function createTicket($post)
     {
+        $log = "\r\n=========================";
         $response = array();
         //Get user details By token
         $userData = $this->getUserModel()->getUserByToken($post['token']);
         if (count($userData) > 0) {
+$currentDate = $this->getAppService()->getDate();
+
+$currentTime = isset($post['time'])?$post['time']:'not';
+$currentTime1 = $this->getAppService()->getTime();
+$drowTime = $this->getAppService()->getDrawTime();
+
+$log .= "\r\n$currentDate|$currentTime1|$currentTime| = $drowTime user: $userData[phoneNo]\r\n";
+
+            if ($userData['ticketTime'] == $post['time']) {
+                $response['bal'] = $userData['avaiPurchaseBal'];
+                $response['yantra'] = $this->getAllYantraForUser($userData);
+                $response['status'] = 'success';
+                $response['message'] = 'Ticket created successfully.';
+                return $response;
+            }
+            
+$log .= "\r\nCURRENT BAL : $userData[avaiPurchaseBal] \r\n";
             //check User Roll.
             if ($userData['userRoll'] == 'local') {
                 $post['ticket'] = json_decode($post['ticket']);
                 $totalQuantity = 0;
+$log .= "INTPUT -> ";
                 //count total price of selected yantra
                 foreach ($post['ticket'] as $ticket) {
+$log .= "$ticket->id : $ticket->val|";
                     $totalQuantity += $ticket->val;
                 }
                 $totalPrice = $totalQuantity * 11;
@@ -399,14 +435,14 @@ class UserPlugin extends AbstractPlugin
                         } else {
                             $dateId = $getTicketDate['Id'];
                         }
-                                
+$log .= "\r\nTAKE -> \r\n";                                
                         //Create Ticket for seperate yantra
                         foreach ($post['ticket'] as $ticket) {
                         if($ticket->val > 0) {
                                 //check ticket exist or not
                                 $ticketData = $this->getTicketModel()->getTicket($dateId,$ticket->id,$drowTime);
                                 if(count($ticketData) == 0) {
-                                    //create ticket
+                                   //create ticket
                                     $newTicket = array (
                                         'dateId' => $dateId,
                                         'time' => $drowTime,
@@ -416,6 +452,7 @@ class UserPlugin extends AbstractPlugin
                                         'totalPrice' => $ticket->val * 11,
                                         'totalWin' => 0
                                     );
+$log .= "\r\n \tCREATE : Y-$newTicket[yantraId] Q-$newTicket[quantity] P-$newTicket[totalPrice]";
                                     $ticketData = $this->getTicketModel()->createTicket($newTicket);
                                 } else {
                                     //update ticket
@@ -423,16 +460,19 @@ class UserPlugin extends AbstractPlugin
                                         'quantity' => $ticketData['quantity'] + $ticket->val,
                                         'totalPrice' => ($ticket->val * 11) + $ticketData['totalPrice'],
                                     );
+$log .= "\r\n \tUPDATE : Y-$ticketData[yantraId] OQ-$ticketData[quantity] NQ-$ticket->val P-$updateTicket[totalPrice]";
+
                                     $ticketData = $this->getTicketModel()->updateTicket($ticketData['Id'],$updateTicket);
                                 }
                             }
                         }
                         //Cut user Bal to Purchase TIcket
                         $updateUser['avaiPurchaseBal'] = $userData['avaiPurchaseBal'] - $totalPrice;
+                        $updateUser['ticketTime'] = $currentTime;//$post['time'];
+$log .= "\r\nNOW BAL : $updateUser[avaiPurchaseBal] \r\n";                        
                         $this->getUserModel()->updateUser($userData['Id'],$updateUser);
                         
                         $response['bal'] = $updateUser['avaiPurchaseBal'];
-                        
                         $response['yantra'] = $this->getAllYantraForUser($userData);
                         $response['status'] = 'success';
                         $response['message'] = 'Ticket created successfully.';
@@ -441,7 +481,7 @@ class UserPlugin extends AbstractPlugin
                     } catch (\Exception $e) {
                         $em->getConnection()->rollback();
                         $response['status'] = 'error';
-                        $response['message'] = 'Internal Server Error.';
+                        $response['message'] = 'Internal Error. Please try agaign';
                     }
                     
                 } else {
@@ -456,6 +496,7 @@ class UserPlugin extends AbstractPlugin
             $response['status'] = 'error';
             $response['message'] = 'Login Fail.';
         }
+        error_log($log,3,'creteticket.log');
         return $response;
     }
     
@@ -596,11 +637,21 @@ class UserPlugin extends AbstractPlugin
                 $daywiseReport = array();
                 //get Day wise report
                 $daywiseReport = $this->getTicketModel()->getDaywiseReport($userData['Id'],$post['startDate'],$post['endDate']);
-                
                 if(count($daywiseReport) > 0) {
                     foreach ($daywiseReport as $rKey => $report) {
                         $daywiseReport[$rKey]['creditBal'] = 0;
                         $daywiseReport[$rKey]['debitBal'] = 0;
+                        
+                        $trasactionData = $this->getTransactionModel()->getTransactionDataByUserIdAndDate($userData['Id'],$report['drawDate']);
+                        if (count($trasactionData) > 0 ) {
+                            foreach ($trasactionData as $key => $transaction) {
+                                if ($transaction['transType'] == 'Credit') {
+                                    $daywiseReport[$rKey]['creditBal'] = $transaction['bal'];
+                                } else {
+                                    $daywiseReport[$rKey]['debitBal'] = $transaction['bal'];
+                                }
+                            }                       
+                        }                        
                     }
                 }
                 $response['status'] = 'success';
@@ -640,7 +691,7 @@ class UserPlugin extends AbstractPlugin
                                 $jackpot = ($drawYantra[0]['jackpot'] == 1)?0:$drawYantra[0]['jackpot'];
                                 $symbol = $drawYantra[0]['yantraId']."-Jackpot:".$jackpot;
                             } else {
-                                $symbol = 'closed';
+                                $symbol = 'working';
                             }
                             $ticketData[$tKey]['symbol'] = $symbol;
                         }
@@ -662,6 +713,282 @@ class UserPlugin extends AbstractPlugin
         }
         return $response;
     }
+    
+    /*
+     * Request For Transfer Balance (Agent)
+     */
+
+    public function transferBalance($post)
+    {
+        $response = array();
+        //Get user details By token
+        $userData = $this->getUserModel()->getUserByToken($post['token']);
+        //Get Local user details By PhoneNo
+        $localUserData = $this->getUserModel()->getLocalUserByPhoneNo($post['phoneNo']);
+        
+        //Check Request
+        if ($post['type'] == 'debit') {
+            if (count($localUserData)) {
+                //check account status
+                if ($localUserData['accountStatus'] == 'Active') {
+                    //check request Bal
+                    if ($localUserData['avaiPurchaseBal'] >= $post['balance']) {
+                        //generate bal request code
+                        $transferCodeMatch = true;
+                        while ($transferCodeMatch == true) {
+                            
+                            $transferCode = rand('111111', '999999');
+                            $getUserInfo = $this->getUserModel()->passwordVerifyCodeExist($transferCode);
+                            if (count($getUserInfo) == 0) {
+                                $transferCodeMatch = false;
+                            }
+                        }
+                        try {
+                            //set transfer code
+                            $updateUserData = array (
+                                'balReqCode' => $transferCode,
+                                'balReq' => $post['balance']
+                            );
+                            $this->getUserModel()->updateUser($localUserData['Id'], $updateUserData);
+                            
+                            //set notification message
+                            $notificationData = array (
+                                'reqFrom' => $userData['Id'],
+                                'reqTo' => $localUserData['Id'],
+                                'requestedName' => $userData['name'],
+                                'message' => 'Send request by Agent for debit your bal : '.$post['balance'].'. Your transfer Code is:'.$transferCode,
+                                'date' => $this->getAppService()->getDateTime()
+                            );
+                            $this->getNotificationModel()->createNotification($notificationData);
+                            
+                            $response['status'] = 'success';
+                            $response['message'] = 'Transfer code send successfully.';
+                                                        
+                        } catch (\Exception $e) {
+                            $response['status'] = 'error';
+                            $response['message'] = 'Something went wrong : Please try agaign.';
+                        }
+                        
+                    } else {
+                        $response['status'] = 'error';
+                        $response['message'] = $post['phoneNo'].': User does not have efficient balance.';
+                    }
+                } else {
+                    $response['status'] = 'error';
+                    $response['message'] = $post['phoneNo'].': User account deactivated by Admin.';
+                }
+            } else {
+                $response['status'] = 'error';
+                $response['message'] = $post['phoneNo'].': User not available.';
+            }
+        } else {
+            //Transfer credit Balance
+            if ($userData['avaiTransBal'] >= $post['balance']) {
+                if (count($localUserData) > 0) {
+                    if ($localUserData['accountStatus'] == 'Active') {
+                        //START TRANSACTION
+                        $em = $this->getController()->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+                        try {
+                            $em->getConnection()->beginTransaction();
+                            
+                            $localUser = array (
+                                'avaiPurchaseBal' => $post['balance'],
+                                'totalWinBal' => 0,
+                            );
+                            //Update Local user balance.
+                            $this->getUserModel()->updateUserBal($localUserData['Id'],$localUser);
+                            
+                            
+                            $agentUser = array (
+                                'avaiTransBal' => $userData['avaiTransBal'] - $post['balance'],
+                            );
+                            //Update Agent user balance.
+                            $this->getUserModel()->updateUser($userData['Id'],$agentUser);
+                            
+                            
+                            $notificationData = array (
+                                'reqFrom' => $userData['Id'],
+                                'reqTo' => $localUserData['Id'],
+                                'requestedName' => $userData['name'],
+                                'message' => 'Your account credited by Agent. Transfer credit is: '.$post['balance'],
+                                'date' => $this->getAppService()->getDateTime()
+                            );                            
+                            //set notification message
+                            $this->getNotificationModel()->createNotification($notificationData);
+                            
+                            $transactionData = array (
+                                'userId' => $userData['Id'],
+                                'agentId' => $localUserData['Id'],
+                                'transBalance' => $post['balance'],
+                                'transType' => 'Credit',
+                                'date' => $this->getAppService()->getDateTime()
+                            );
+                            //create Transaction report
+                            $this->getTransactionModel()->createTransaction($transactionData);
+                            
+                            $response['status'] = 'success';
+                            $response['message'] = 'Balance tranfer successfully.';
+
+                            $em->getConnection()->commit();
+                        } catch (\Exception $e) {
+                            $em->getConnection()->rollback();
+                            $response['status'] = 'error';
+                            $response['message'] = 'Internal Error. Please try agaign.';
+                        }
+                    } else {
+                        $response['status'] = 'error';
+                        $response['message'] = $post['phoneNo'].': User account deactivated by Admin.';
+                    }
+                } else {
+                    $response['status'] = 'error';
+                    $response['message'] = $post['phoneNo'].': User not available.';
+                }
+            } else {
+                $response['status'] = 'error';
+                $response['message'] = 'you do have not efficient balance.';
+            }
+        }
+        return $response;
+    }
+    
+    /*
+     * Request For Debit Balance By Transfer Code (Agent)
+     */
+
+    public function sendTransferCode($post)
+    {
+        $response = array();
+        //Get user details By token
+        $userData = $this->getUserModel()->getUserByToken($post['token']);
+        //Get Local user details By PhoneNo
+        $localUserData = $this->getUserModel()->getLocalUserByTransferCode($post['code']);
+        
+        //Check Request Code
+        if (count($localUserData)) {
+            //check account status
+            if ($localUserData['accountStatus'] == 'Active') {
+                //check request Bal
+                if ($localUserData['avaiPurchaseBal'] >= $localUserData['balReq']) {
+                    
+                    //START TRANSACTION
+                    $em = $this->getController()->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+                    try {
+                        $em->getConnection()->beginTransaction();
+
+                        $localUser = array (
+                            'avaiPurchaseBal' => $localUserData['avaiPurchaseBal'] - $localUserData['balReq'],
+                            'balReqCode' => 0,
+                            'balReq' => 0
+                        );
+                        //cut balance from Local user account
+                        $this->getUserModel()->updateUser($localUserData['Id'],$localUser);
+
+
+                        $agentUser = array (
+                            'avaiTransBal' => $userData['avaiTransBal'] + $localUserData['balReq'],
+                        );
+                        //Update Agent user balance.
+                        $this->getUserModel()->updateUser($userData['Id'],$agentUser);
+
+
+                        $notificationData = array (
+                            'reqFrom' => $userData['Id'],
+                            'reqTo' => $localUserData['Id'],
+                            'requestedName' => $userData['name'],
+                            'message' => 'Your balance will be transfer by Agent. Transfer credit is: '.$localUserData['balReq'],
+                            'date' => $this->getAppService()->getDateTime()
+                        );                            
+                        //set notification message
+                        $this->getNotificationModel()->createNotification($notificationData);
+
+                        $transactionData = array (
+                            'userId' => $userData['Id'],
+                            'agentId' => $localUserData['Id'],
+                            'transBalance' => $localUserData['balReq'],
+                            'transType' => 'Debit',
+                            'date' => $this->getAppService()->getDateTime()
+                        );
+                        //create Transaction report
+                        $this->getTransactionModel()->createTransaction($transactionData);
+
+                        $response['status'] = 'success';
+                        $response['message'] = 'Balance Debit successfully From : '.$localUserData['phoneNo'];
+
+                        $em->getConnection()->commit();
+                    } catch (\Exception $e) {
+                        $em->getConnection()->rollback();
+                        $response['status'] = 'error';
+                        $response['message'] = 'Internal Error. Please try agaign.';
+                    }
+                } else {
+                    $response['status'] = 'error';
+                    $response['message'] = $post['phoneNo'].': User does not have efficient balance.';
+                }
+            } else {
+                $response['status'] = 'error';
+                $response['message'] = $post['phoneNo'].': User account deactivated by Admin.';
+            }
+        } else {
+            $response['status'] = 'error';
+            $response['message'] = 'Request code not found. If you fail more time then your account will be Block.';
+        }
+        
+        return $response;
+    }
+    
+    /*
+     * Get Notification 
+     */
+
+    public function getNotification($post)
+    {
+        $response = array();
+        //Get user details By token
+        $userData = $this->getUserModel()->getUserByToken($post['token']);
+        
+        //Check Request Code
+        if (count($userData)) {
+            try {
+                $response['status'] = 'success';
+                $response['data'] = $this->getNotificationModel()->getNotification($userData['Id']);
+            } catch(\Exception $e) {
+                $response['status'] = 'error';
+                $response['message'] = 'Something went wrong.Please try agaign.';
+            }
+        } else {
+            $response['status'] = 'error';
+            $response['message'] = 'Access denied.';
+        }        
+        return $response;
+    }
+    
+    /*
+     * Get Transaction 
+     */
+
+    public function transactionReport($post)
+    {
+        $response = array();
+        //Get user details By token
+        $userData = $this->getUserModel()->getUserByToken($post['token']);
+        
+        //Check Request Code
+        if (count($userData)) {
+            try {
+                $response['status'] = 'success';
+                $response['data'] = $this->getTransactionModel()->getTransactionReport($userData['Id'],$post['date']);
+            } catch(\Exception $e) {
+                $response['status'] = 'error';
+                $response['message'] = 'Something went wrong.Please try agaign.';
+            }
+        } else {
+            $response['status'] = 'error';
+            $response['message'] = 'Access denied.';
+        }
+        
+        return $response;
+    }
+    
     
     /*
      * UDF FOR GET ALL USER'S YANTRA DATA

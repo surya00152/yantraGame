@@ -12,6 +12,7 @@ class TicketDate implements ServiceManagerAwareInterface {
      * Can be used as part of method name for entity processing
      */
     const ENTITY = 'User\Model\Entity\TicketDate';
+    const USERENTITY = 'User\Model\Entity\User';
 
     /**
      * @var ServiceManager
@@ -76,5 +77,30 @@ class TicketDate implements ServiceManagerAwareInterface {
                 ->where('td.drawDate = '.$qb->expr()->literal($date))
                 ->getQuery()
                 ->getArrayResult();
+    }
+    
+    /**
+     * Get User Data By Ticke Date
+     */
+    public function getUserDataByTicketDate($date) {
+        $qb = $this->entityManager->createQueryBuilder();
+        return $qb->select('td.Id,td.userId,u.avaiPurchaseBal')
+                ->from(self::ENTITY, 'td')
+                ->leftJoin(self::USERENTITY, 'u','with', 'td.userId = u.Id')
+                ->where('td.drawDate = '.$qb->expr()->literal($date))
+                ->getQuery()
+                ->getArrayResult();
+    }
+    
+    /**
+     * Update Date Ticket Details By Id
+     * 
+     */
+    public function updateDateTicket($id,$data) {
+        $ticketDateEntity = $this->repository->findOneBy(array('Id' => $id));
+        $ticketDateEntity->populate($data);
+        $this->entityManager->merge($ticketDateEntity);
+        $this->entityManager->flush();
+        return $ticketDateEntity;
     }
 }

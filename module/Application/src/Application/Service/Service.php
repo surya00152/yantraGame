@@ -80,7 +80,7 @@ class Service implements ServiceManagerAwareInterface {
     {
         $date = new \DateTIme('NOW');
         $date->setTimezone(new \DateTimeZone('Asia/Kolkata'));
-        $date = $date->modify("-59 second");
+        $date = $date->modify("-20 second");
               
         return $date = $date->format("H:i:s");
     }

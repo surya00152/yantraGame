@@ -32,6 +32,8 @@ return array(
             'User\Model\DrowYantra' => 'User\Model\DrowYantra',
             'User\Model\TicketDate' => 'User\Model\TicketDate',
             'User\Model\Ticket' => 'User\Model\Ticket',
+            'User\Model\Notification' => 'User\Model\Notification',
+            'User\Model\Transaction' => 'User\Model\Transaction'
         )
     ),
     'view_manager' => array(

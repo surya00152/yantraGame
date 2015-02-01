@@ -11,7 +11,9 @@
                 ->appendStylesheet($this->basePath() . '/dist/css/sb-admin-2.css')
                 ->appendStylesheet($this->basePath() . '/bower_components/morrisjs/morris.css')
                 ->appendStylesheet($this->basePath() . '/bower_components/fontawesome/css/font-awesome.min.css')
-                ->appendStylesheet($this->basePath() . '/css/bootstrap-toggle.min.css');
+                ->appendStylesheet($this->basePath() . '/css/bootstrap-toggle.min.css')
+                ->appendStylesheet($this->basePath() . '/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css')
+                ->appendStylesheet($this->basePath() . '/bower_components/datatables-responsive/css/dataTables.responsive.css');
 
         // Set javascripts
         echo $this->headScript()
@@ -21,7 +23,9 @@
                 ->appendFile($this->basePath() . '/bower_components/raphael/raphael-min.js')
                 ->appendFile($this->basePath() . '/bower_components/morrisjs/morris.min.js')
                 ->appendFile($this->basePath() . '/dist/js/sb-admin-2.js')
-                ->appendFile($this->basePath() . '/js/bootstrap-toggle.min.js');
+                ->appendFile($this->basePath() . '/js/bootstrap-toggle.min.js')
+                ->appendFile($this->basePath() . '/bower_components/DataTables/media/js/jquery.dataTables.min.js')
+                ->appendFile($this->basePath() . '/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js');
         ?>
 
     </head>
@@ -101,10 +105,10 @@
                                 <a href="javascript:void(0);"><i class="fa fa-users fa-fw"></i> Users<span class="fa arrow"></span></a>
                                 <ul class="nav nav-second-level">
                                     <li>
-                                        <a href="javascript:void(0);">Local Users</a>
+                                        <a href="<?php echo $this->basePath() ?>/admin/localUsers">Local Users</a>
                                     </li>
                                     <li>
-                                        <a href="javascript:void(0);">Agent Users</a>
+                                        <a href="<?php echo $this->basePath() ?>/admin/agentUsers">Agent Users</a>
                                     </li>
                                 </ul>
                                 <!-- /.nav-second-level -->

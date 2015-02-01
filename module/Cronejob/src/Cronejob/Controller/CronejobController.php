@@ -18,8 +18,9 @@ class CronejobController extends AbstractActionController
      */
     public function drawNowAction()
     {
-        //get Draw Time
+        //get Draw Time & Date
         $drawTime = $this->userPlugin()->getAppService()->getDrawTime();
+        $drawDate = $this->userPlugin()->getAppService()->getDate();
         if (empty($drawTime)) {
             $drawTime = '00:00:00';
         }
@@ -87,14 +88,20 @@ class CronejobController extends AbstractActionController
                 foreach ($getDateDetails as $dateDrawData) {
                     //Update user's ticket status to 1 (complete drow)
                     $this->userPlugin()->getTicketModel()->updateTicketStatus($drawTime,$dateDrawData['Id'],'1');
+                    
                 }    
             }
-
-            //update all Closing bal
-            /*$updateTicket = array (
-                'totalWin' => $detail['quantity'] * 100,
-            );
-            $this->userPlugin()->getTicketModel()->update($detail['Id'],$updateTicket);*/
+        }
+        //update all user's Closing bal
+        if ($drawTime == '00:00:00') {
+            //get all user tickets by date
+            $drowDateData = $this->userPlugin()->getTicketDateModel()->getUserDataByTicketDate($drawDate);
+            if (count($drowDateData) > 0) {
+                foreach ($drowDateData as $key => $dateData) {
+                    $updateDateData = array ('closeBal' => $dateData['avaiPurchaseBal']);
+                    $this->userPlugin()->getTicketDateModel()->updateDateTicket($dateData['Id'],$updateDateData);
+                }
+            }
         }
         exit('END CRONE-JOB');
     }

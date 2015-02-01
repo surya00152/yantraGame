@@ -72,6 +72,11 @@ class User
      * @ORM\Column(length=30);
      */
     protected $balReqCode;
+    
+    /**
+     * @ORM\Column(length=10);
+     */
+    protected $balReq;
 
     /**
      * @ORM\Column(length=50);
@@ -107,7 +112,13 @@ class User
      * @ORM\Column(length=255);
      */
     protected $loginToken;
+    
+    /**
+     * @ORM\Column(length=100);
+     */
+    protected $ticketTime;
 
+    
     /**
      * Magic getter to expose protected properties.
      * @param string $property
