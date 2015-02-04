@@ -8,6 +8,7 @@
         echo $this->headLink()->appendStylesheet($this->basePath() . '/bower_components/bootstrap/dist/css/bootstrap.min.css')
                 ->appendStylesheet($this->basePath() . '/bower_components/metisMenu/dist/metisMenu.min.css')
                 ->appendStylesheet($this->basePath() . '/dist/css/timeline.css')
+                ->appendStylesheet($this->basePath() . '/dist/css/jquery-ui.css')
                 ->appendStylesheet($this->basePath() . '/dist/css/sb-admin-2.css')
                 ->appendStylesheet($this->basePath() . '/bower_components/morrisjs/morris.css')
                 ->appendStylesheet($this->basePath() . '/bower_components/fontawesome/css/font-awesome.min.css')
@@ -18,6 +19,7 @@
         // Set javascripts
         echo $this->headScript()
                 ->appendFile($this->basePath() . '/bower_components/jquery/dist/jquery.min.js')
+                ->appendFile($this->basePath() . '/dist/js/jquery-ui.js')
                 ->appendFile($this->basePath() . '/bower_components/bootstrap/dist/js/bootstrap.min.js')
                 ->appendFile($this->basePath() . '/bower_components/metisMenu/dist/metisMenu.min.js')
                 ->appendFile($this->basePath() . '/bower_components/raphael/raphael-min.js')

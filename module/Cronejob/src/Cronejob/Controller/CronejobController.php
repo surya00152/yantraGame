@@ -117,7 +117,7 @@ class CronejobController extends AbstractActionController
         if(count($getYantraRateList) == 10) {
             /* If All Selected */
             //Find Min Value From All Records
-            $minQuantity = min($this->rray_column($getYantraRateList, 'quantity'));
+            $minQuantity = min($this->array_column($getYantraRateList, 'quantity'));
             //get yantra Id by min quantity
             foreach ($getYantraRateList as $details) {
                 if ($details['quantity'] == $minQuantity) {

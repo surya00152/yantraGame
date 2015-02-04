@@ -566,11 +566,18 @@ $log .= "\r\nNOW BAL : $updateUser[avaiPurchaseBal] \r\n";
      * Get Purchase Report
      */
 
-    public function getPurchaseReport($post)
+    public function getPurchaseReport($post,$isAdmin = false)
     {
         $response = array();
-        //Get user details By token
-        $userData = $this->getUserModel()->getUserByToken($post['token']);
+        
+        if ($isAdmin == true && isset($post['Id'])) {
+            $userData = $post;
+        } else {
+            //Get user details By token
+            $userData = $this->getUserModel()->getUserByToken($post['token']);
+        }
+        
+        
         if (count($userData) > 0) {
             //check User Roll.
             if ($userData['userRoll'] == 'local') {
@@ -625,11 +632,17 @@ $log .= "\r\nNOW BAL : $updateUser[avaiPurchaseBal] \r\n";
      * Get Daywise Report
      */
     
-    public function getDaywiseReport($post)
+    public function getDaywiseReport($post,$isAdmin = false)
     {
         $response = array();
-        //Get user details By token
-        $userData = $this->getUserModel()->getUserByToken($post['token']);
+        
+        if ($isAdmin == true && isset($post['Id'])) {
+            $userData = $post;
+        } else {
+            //Get user details By token
+            $userData = $this->getUserModel()->getUserByToken($post['token']);
+        }
+        
         if (count($userData) > 0) {
             //check User Roll.
             if ($userData['userRoll'] == 'local') {
@@ -672,11 +685,16 @@ $log .= "\r\nNOW BAL : $updateUser[avaiPurchaseBal] \r\n";
      * Get Showwise Report
      */
 
-    public function getShowwiseReport($post)
+    public function getShowwiseReport($post,$isAdmin = false)
     {
         $response = array();
-        //Get user details By token
-        $userData = $this->getUserModel()->getUserByToken($post['token']);
+        if ($isAdmin == true && isset($post['Id'])) {
+            $userData = $post;
+        } else {
+            //Get user details By token
+            $userData = $this->getUserModel()->getUserByToken($post['token']);
+        }
+        
         if (count($userData) > 0) {
             //check User Roll.
             if ($userData['userRoll'] == 'local') {
@@ -691,7 +709,7 @@ $log .= "\r\nNOW BAL : $updateUser[avaiPurchaseBal] \r\n";
                                 $jackpot = ($drawYantra[0]['jackpot'] == 1)?0:$drawYantra[0]['jackpot'];
                                 $symbol = $drawYantra[0]['yantraId']."-Jackpot:".$jackpot;
                             } else {
-                                $symbol = 'working';
+                                $symbol = 'Running';
                             }
                             $ticketData[$tKey]['symbol'] = $symbol;
                         }

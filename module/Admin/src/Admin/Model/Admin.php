@@ -67,4 +67,16 @@ class Admin implements ServiceManagerAwareInterface {
                 ->getQuery()
                 ->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
+    
+    /**
+     *  Get DrowMode
+     *  
+     */
+    public function updateAdmin($data) {
+        $adminEntity = $this->repository->findOneBy(array('Id' => 1));
+        $adminEntity->populate($data);
+        $this->entityManager->merge($adminEntity);
+        $this->entityManager->flush();
+        return $adminEntity;
+    }
 }
