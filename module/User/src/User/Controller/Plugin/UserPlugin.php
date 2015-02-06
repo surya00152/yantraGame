@@ -347,15 +347,17 @@ class UserPlugin extends AbstractPlugin
         if (count($userData) > 0) {
             //check User Roll.
             if ($userData['userRoll'] == 'local') {
-                $time = $this->getAppService()->getDrawTime();
+                $dashTime = $this->getAppService()->getUserDashboardTime();
+                $time = $this->getAppService()->getDrawTime($dashTime);
                 if(empty($time)) {
                     $time = '00:00:00';
                 }
                 $currentDate = $this->getAppService()->getDate();
+                                             
                 //get local user dashboard
                 $response['status'] = 'success';
                 $response['data']['yantra'] = $this->getAllYantraForUser($userData);
-                $response['data']['drawYantra'] = $this->getDrowModel()->getAllDrowYantra($currentDate);
+                $response['data']['drawYantra'] = $this->getDrowModel()->getAllDrowYantra($currentDate,$time);
                 $response['data']['dashboardCommon']['balance'] = $userData['avaiPurchaseBal'];
                 $response['data']['dashboardCommon']['endTime'] = $time;
                 $response['data']['dashboardCommon']['currentTime'] = $this->getAppService()->getUserDashboardTime();
@@ -371,6 +373,138 @@ class UserPlugin extends AbstractPlugin
         return $response;
     }
     
+//    /*
+//     * Create new ticket
+//     */
+//
+//    public function createTicket($post)
+//    {
+//        $log = "\r\n=========================";
+//        $response = array();
+//        //Get user details By token
+//        $userData = $this->getUserModel()->getUserByToken($post['token']);
+//        if (count($userData) > 0) {
+//$currentDate = $this->getAppService()->getDate();
+//
+//$currentTime = isset($post['time'])?$post['time']:'not';
+//$currentTime1 = $this->getAppService()->getTime();
+//$drowTime = $this->getAppService()->getDrawTime();
+//
+//$log .= "\r\n$currentDate|$currentTime1|$currentTime| = $drowTime user: $userData[phoneNo]\r\n";
+//
+//            if ($userData['ticketTime'] == $post['time']) {
+//                $response['bal'] = $userData['avaiPurchaseBal'];
+//                $response['yantra'] = $this->getAllYantraForUser($userData);
+//                $response['status'] = 'success';
+//                $response['message'] = 'Ticket created successfully.';
+//                return $response;
+//            }
+//            
+//$log .= "\r\nCURRENT BAL : $userData[avaiPurchaseBal] \r\n";
+//            //check User Roll.
+//            if ($userData['userRoll'] == 'local') {
+//                $post['ticket'] = json_decode($post['ticket']);
+//                $totalQuantity = 0;
+//$log .= "INTPUT -> ";
+//                //count total price of selected yantra
+//                foreach ($post['ticket'] as $ticket) {
+//$log .= "$ticket->id : $ticket->val|";
+//                    $totalQuantity += $ticket->val;
+//                }
+//                $totalPrice = $totalQuantity * 11;
+//                //START TRANSACTION
+//                $em = $this->getController()->getServiceLocator()->get('doctrine.entitymanager.orm_default');                    
+//                
+//                if ($totalPrice <= $userData['avaiPurchaseBal']){
+//                  try {
+//                        $em->getConnection()->beginTransaction();
+//
+//                        $currentDate = $this->getAppService()->getDate();
+//                        $drowTime = $this->getAppService()->getDrawTime();
+//                        if (empty($$drowTime)) {
+//                            $drowTime = '00:00:00';
+//                        }
+//                        //check date records exist if not then create new if Yes then use Id
+//                        $getTicketDate = $this->getTicketDateModel()->getTicketDate($userData['Id'],$currentDate);
+//
+//                        if (count($getTicketDate) == 0) {
+//                            //create Date Records
+//                            $dateData  = array (
+//                                'userId' => $userData['Id'],
+//                                'drawDate' => $currentDate,
+//                                'openingBal' => $userData['avaiPurchaseBal'],
+//                            );
+//
+//                            $getDateEntity = $this->getTicketDateModel()->createTicketDate($dateData);
+//                            $dateId = $getDateEntity->Id;
+//                        } else {
+//                            $dateId = $getTicketDate['Id'];
+//                        }
+//$log .= "\r\nTAKE -> \r\n";                                
+//                        //Create Ticket for seperate yantra
+//                        foreach ($post['ticket'] as $ticket) {
+//                        if($ticket->val > 0) {
+//                                //check ticket exist or not
+//                                $ticketData = $this->getTicketModel()->getTicket($dateId,$ticket->id,$drowTime);
+//                                if(count($ticketData) == 0) {
+//                                   //create ticket
+//                                    $newTicket = array (
+//                                        'dateId' => $dateId,
+//                                        'time' => $drowTime,
+//                                        'yantraId' => $ticket->id,
+//                                        'quantity' => $ticket->val,
+//                                        'status' => 0,
+//                                        'totalPrice' => $ticket->val * 11,
+//                                        'totalWin' => 0
+//                                    );
+//$log .= "\r\n \tCREATE : Y-$newTicket[yantraId] Q-$newTicket[quantity] P-$newTicket[totalPrice]";
+//                                    $ticketData = $this->getTicketModel()->createTicket($newTicket);
+//                                } else {
+//                                    //update ticket
+//                                    $updateTicket = array (
+//                                        'quantity' => $ticketData['quantity'] + $ticket->val,
+//                                        'totalPrice' => ($ticket->val * 11) + $ticketData['totalPrice'],
+//                                    );
+//$log .= "\r\n \tUPDATE : Y-$ticketData[yantraId] OQ-$ticketData[quantity] NQ-$ticket->val P-$updateTicket[totalPrice]";
+//
+//                                    $ticketData = $this->getTicketModel()->updateTicket($ticketData['Id'],$updateTicket);
+//                                }
+//                            }
+//                        }
+//                        //Cut user Bal to Purchase TIcket
+//                        $updateUser['avaiPurchaseBal'] = $userData['avaiPurchaseBal'] - $totalPrice;
+//                        $updateUser['ticketTime'] = $currentTime;//$post['time'];
+//$log .= "\r\nNOW BAL : $updateUser[avaiPurchaseBal] \r\n";                        
+//                        $this->getUserModel()->updateUser($userData['Id'],$updateUser);
+//                        
+//                        $response['bal'] = $updateUser['avaiPurchaseBal'];
+//                        $response['yantra'] = $this->getAllYantraForUser($userData);
+//                        $response['status'] = 'success';
+//                        $response['message'] = 'Ticket created successfully.';
+//
+//                        $em->getConnection()->commit();
+//                    } catch (\Exception $e) {
+//                        $em->getConnection()->rollback();
+//                        $response['status'] = 'error';
+//                        $response['message'] = 'Internal Error. Please try agaign';
+//                    }
+//                    
+//                } else {
+//                    $response['status'] = 'error';
+//                    $response['message'] = 'You do not have efficiant balance.';
+//                }
+//            } else {
+//                $response['status'] = 'error';
+//                $response['message'] = 'Access Denied.';
+//            }            
+//        } else {
+//            $response['status'] = 'error';
+//            $response['message'] = 'Login Fail.';
+//        }
+//        error_log($log,3,'creteticket.log');
+//        return $response;
+//    }
+    
     /*
      * Create new ticket
      */
@@ -382,15 +516,7 @@ class UserPlugin extends AbstractPlugin
         //Get user details By token
         $userData = $this->getUserModel()->getUserByToken($post['token']);
         if (count($userData) > 0) {
-$currentDate = $this->getAppService()->getDate();
-
-$currentTime = isset($post['time'])?$post['time']:'not';
-$currentTime1 = $this->getAppService()->getTime();
-$drowTime = $this->getAppService()->getDrawTime();
-
-$log .= "\r\n$currentDate|$currentTime1|$currentTime| = $drowTime user: $userData[phoneNo]\r\n";
-
-            if ($userData['ticketTime'] == $post['time']) {
+           if ($userData['ticketTime'] == $post['time']) {
                 $response['bal'] = $userData['avaiPurchaseBal'];
                 $response['yantra'] = $this->getAllYantraForUser($userData);
                 $response['status'] = 'success';
@@ -398,15 +524,15 @@ $log .= "\r\n$currentDate|$currentTime1|$currentTime| = $drowTime user: $userDat
                 return $response;
             }
             
-$log .= "\r\nCURRENT BAL : $userData[avaiPurchaseBal] \r\n";
+
             //check User Roll.
             if ($userData['userRoll'] == 'local') {
                 $post['ticket'] = json_decode($post['ticket']);
                 $totalQuantity = 0;
-$log .= "INTPUT -> ";
+
                 //count total price of selected yantra
                 foreach ($post['ticket'] as $ticket) {
-$log .= "$ticket->id : $ticket->val|";
+
                     $totalQuantity += $ticket->val;
                 }
                 $totalPrice = $totalQuantity * 11;
@@ -419,6 +545,9 @@ $log .= "$ticket->id : $ticket->val|";
 
                         $currentDate = $this->getAppService()->getDate();
                         $drowTime = $this->getAppService()->getDrawTime();
+                        if (empty($drowTime)) {
+                            $drowTime = '00:00:00';
+                        }
                         //check date records exist if not then create new if Yes then use Id
                         $getTicketDate = $this->getTicketDateModel()->getTicketDate($userData['Id'],$currentDate);
 
@@ -435,7 +564,7 @@ $log .= "$ticket->id : $ticket->val|";
                         } else {
                             $dateId = $getTicketDate['Id'];
                         }
-$log .= "\r\nTAKE -> \r\n";                                
+
                         //Create Ticket for seperate yantra
                         foreach ($post['ticket'] as $ticket) {
                         if($ticket->val > 0) {
@@ -452,7 +581,6 @@ $log .= "\r\nTAKE -> \r\n";
                                         'totalPrice' => $ticket->val * 11,
                                         'totalWin' => 0
                                     );
-$log .= "\r\n \tCREATE : Y-$newTicket[yantraId] Q-$newTicket[quantity] P-$newTicket[totalPrice]";
                                     $ticketData = $this->getTicketModel()->createTicket($newTicket);
                                 } else {
                                     //update ticket
@@ -460,16 +588,15 @@ $log .= "\r\n \tCREATE : Y-$newTicket[yantraId] Q-$newTicket[quantity] P-$newTic
                                         'quantity' => $ticketData['quantity'] + $ticket->val,
                                         'totalPrice' => ($ticket->val * 11) + $ticketData['totalPrice'],
                                     );
-$log .= "\r\n \tUPDATE : Y-$ticketData[yantraId] OQ-$ticketData[quantity] NQ-$ticket->val P-$updateTicket[totalPrice]";
-
                                     $ticketData = $this->getTicketModel()->updateTicket($ticketData['Id'],$updateTicket);
                                 }
                             }
                         }
+                        $getTime = $this->getAppService()->getTime();                      
                         //Cut user Bal to Purchase TIcket
                         $updateUser['avaiPurchaseBal'] = $userData['avaiPurchaseBal'] - $totalPrice;
-                        $updateUser['ticketTime'] = $currentTime;//$post['time'];
-$log .= "\r\nNOW BAL : $updateUser[avaiPurchaseBal] \r\n";                        
+                        $updateUser['ticketTime'] = isset($post['time'])?$post['time']:$getTime;
+
                         $this->getUserModel()->updateUser($userData['Id'],$updateUser);
                         
                         $response['bal'] = $updateUser['avaiPurchaseBal'];
@@ -496,7 +623,6 @@ $log .= "\r\nNOW BAL : $updateUser[avaiPurchaseBal] \r\n";
             $response['status'] = 'error';
             $response['message'] = 'Login Fail.';
         }
-        error_log($log,3,'creteticket.log');
         return $response;
     }
     
@@ -509,6 +635,7 @@ $log .= "\r\nNOW BAL : $updateUser[avaiPurchaseBal] \r\n";
         $response = array();
         //Get user details By token
         $userData = $this->getUserModel()->getUserByToken($post['token']);
+        
         if (count($userData) > 0) {
             //check User Roll.
             if ($userData['userRoll'] == 'local') {
@@ -519,7 +646,8 @@ $log .= "\r\nNOW BAL : $updateUser[avaiPurchaseBal] \r\n";
                 $dates = new \DateTime(date($date." ".$time));
                 $dates->modify("-15 min");
                 $time = $dates->format("H:i:s");
-                 
+                $date = $dates->format("d-m-Y");
+                
                 $getTicket = $this->getTicketModel()->getTicketByUserId($date,$time,$userData['Id']);
                 
                 $drowDone = false;
@@ -649,6 +777,7 @@ $log .= "\r\nNOW BAL : $updateUser[avaiPurchaseBal] \r\n";
                 //Get User Ticket Status
                 $daywiseReport = array();
                 //get Day wise report
+                $currentDate = $this->getAppService()->getDate();
                 $daywiseReport = $this->getTicketModel()->getDaywiseReport($userData['Id'],$post['startDate'],$post['endDate']);
                 if(count($daywiseReport) > 0) {
                     foreach ($daywiseReport as $rKey => $report) {
@@ -662,9 +791,12 @@ $log .= "\r\nNOW BAL : $updateUser[avaiPurchaseBal] \r\n";
                                     $daywiseReport[$rKey]['creditBal'] = $transaction['bal'];
                                 } else {
                                     $daywiseReport[$rKey]['debitBal'] = $transaction['bal'];
-                                }
+                                }                            
                             }                       
-                        }                        
+                        }
+                        if ($report['drawDate'] == $currentDate) {
+                            $daywiseReport[$rKey]['closeBal'] = $userData['avaiPurchaseBal'];
+                        }
                     }
                 }
                 $response['status'] = 'success';

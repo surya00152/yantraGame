@@ -56,14 +56,25 @@ class DrowYantra implements ServiceManagerAwareInterface {
     /**
      * Get all drow yantra
      */
-    public function getAllDrowYantra($date) {
+    public function getAllDrowYantra($date,$time = null) {
         $qb = $this->entityManager->createQueryBuilder();
-        return $qb->select('dy')
+        if ($time !== null) {
+            return $qb->select('dy')
+                ->from(self::ENTITY, 'dy')
+                ->where($qb->expr()->like('dy.drawTime', $qb->expr()->literal($date. '%')))
+                ->where($qb->expr()->notLike('dy.drawTime', $qb->expr()->literal('%'.$time)))
+                ->orderBy('dy.Id','desc')
+                ->getQuery()
+                ->getArrayResult();
+        } else {
+            return $qb->select('dy')
                 ->from(self::ENTITY, 'dy')
                 ->where($qb->expr()->like('dy.drawTime', $qb->expr()->literal($date. '%')))
                 ->orderBy('dy.Id','desc')
                 ->getQuery()
                 ->getArrayResult();
+        }
+        
     }
     
     /**

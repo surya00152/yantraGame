@@ -241,11 +241,9 @@ class AdminController extends AbstractActionController
                 
         //Get post value from html form.
         $post = $this->getRequest()->getPost();
+        
         $isValid = false;    
-        if ($post['drawMode'] >= 1 && $post['drawMode'] >= 3) {
-            if (!isset($post['jackpotMode'])) {
-                $post['jackpotMode'] = 'off';
-            }
+        if ($post['drawMode'] >= 1 && $post['drawMode'] <= 3) {
             if (isset($post['manual'])) {
                 if ($post['manual'] >= 1 && $post['manual'] <= 10) {
                     $isValid = true;
@@ -255,7 +253,6 @@ class AdminController extends AbstractActionController
             }
             if (isset($post['percentage'])) {
                 if ($post['percentage'] >= 1 && $post['percentage'] <= 50) {
-                    $post['jackpotMode'] = 'off';
                     $isValid = true;
                 } else {
                     $error = 'Invalid Selected Persantage.';
@@ -266,15 +263,11 @@ class AdminController extends AbstractActionController
         }
         
         if ($isValid == true) {
+            //echo '<pre>';print_r($post);exit;
             unset($post['name']);
             unset($post['userName']);
             unset($post['password']);
             
-            if ($post['jackpotMode'] == 'on') {
-                $post['jackpotMode'] = 1;
-            } else {
-                $post['jackpotMode'] = 0;
-            }
             //Update Yantra Mode Info
             $this->adminPlugin()->getAdminModel()->updateAdmin($post);
         }
@@ -282,6 +275,102 @@ class AdminController extends AbstractActionController
         return $this->redirect()->toUrl('/public/admin/dashboard');
     }
     
+    public function changeUserCreditAction()
+    {
+        if (!$this->adminPlugin()->isAdminLogin()) {
+            return $this->redirect()->toUrl('/public/admin/login');
+        }                
+        //Get post value from html form.
+        $post = $this->getRequest()->getPost();
+        
+        if (count($post) > 0) {
+            //Get user details By Id
+            $userData = $this->userPlugin()->getUserModel()->getUserById($post['userId']);
+            if (count($userData) > 0) {
+                if (is_numeric($post['balVal']) && $post['balVal'] > 0) {
+                    
+                    if ($post['type'] == 'credit') {
+                        //CREDIT
+                        if ($userData['userRoll'] == 'agent') {
+                            $updateUser['avaiTransBal'] = $userData['avaiTransBal'] + $post['balVal'];
+                            $updateUser['totalTranBal'] = $userData['totalTranBal'] + $post['balVal'];
+                            
+                            $this->userPlugin()->getUserModel()->updateUser($userData['Id'],$updateUser);
+                            
+                            $transactionData = array (
+                                'userId' => 1,
+                                'agentId' => $userData['Id'],
+                                'transBalance' => $post['balVal'],
+                                'transType' => 'Credit',
+                                'date' => $this->userPlugin()->getAppService()->getDateTime()
+                            );
+                            //create Transaction report
+                            $this->userPlugin()->getTransactionModel()->createTransaction($transactionData);
+
+                        } else {
+                            $updateUser['avaiPurchaseBal'] = $userData['avaiPurchaseBal'] + $post['balVal'];
+                            $updateUser['avaiPurchaseBal'] = $userData['avaiPurchaseBal'] + $post['balVal'];
+                            
+                            $this->userPlugin()->getUserModel()->updateUser($userData['Id'],$updateUser);
+                            //set notification message
+                            $notificationData = array (
+                                'reqFrom' => 1,
+                                'reqTo' => $userData['Id'],
+                                'requestedName' => 'Admin',
+                                'message' => 'Your Account Credited by Admin. Added balance is : '.$post['balVal'],
+                                'date' => $this->userPlugin()->getAppService()->getDateTime()
+                            );
+                            $this->userPlugin()->getNotificationModel()->createNotification($notificationData);
+                        }                        
+                        $message = 'Account credited successfully';
+                    } else {
+                        //DEBIT
+                        if ($userData['userRoll'] == 'agent') {
+                            $updateUser['avaiTransBal'] = $userData['avaiTransBal'] - $post['balVal'];
+                            $updateUser['totalTranBal'] = $userData['totalTranBal'] - $post['balVal'];
+                            
+                            $this->userPlugin()->getUserModel()->updateUser($userData['Id'],$updateUser);
+                            
+                            $transactionData = array (
+                                'userId' => 1,
+                                'agentId' => $userData['Id'],
+                                'transBalance' => $post['balVal'],
+                                'transType' => 'Debit',
+                                'date' => $this->userPlugin()->getAppService()->getDateTime()
+                            );
+                            //create Transaction report
+                            $this->userPlugin()->getTransactionModel()->createTransaction($transactionData);
+
+                        } else {
+                            $updateUser['avaiPurchaseBal'] = $userData['avaiPurchaseBal'] - $post['balVal'];
+                            $updateUser['avaiPurchaseBal'] = $userData['avaiPurchaseBal'] - $post['balVal'];
+                            
+                            $this->userPlugin()->getUserModel()->updateUser($userData['Id'],$updateUser);
+                            //set notification message
+                            $notificationData = array (
+                                'reqFrom' => 1,
+                                'reqTo' => $userData['Id'],
+                                'requestedName' => 'Admin',
+                                'message' => 'Your Account Debited by Admin. Debit balance is : '.$post['balVal'],
+                                'date' => $this->userPlugin()->getAppService()->getDateTime()
+                            );
+                            $this->userPlugin()->getNotificationModel()->createNotification($notificationData);
+                        }                        
+                        $message = 'Account Debited successfully';
+                    }                   
+                } else {
+                    $message = 'Invalid input Balance.';
+                }
+            } else {
+                $message = 'User not exist.';
+            }
+        }
+        if ($post['userRoll'] == 'local') {
+            return $this->redirect()->toUrl('/public/admin/localUsers');
+        } else {
+            return $this->redirect()->toUrl('/public/admin/agentUsers');
+        }
+    }
     
     
 }

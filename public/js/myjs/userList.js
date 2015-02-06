@@ -1,4 +1,4 @@
-jQuery(document).ready(function() {
+$(document).ready(function() {
     
     $('[data-toggle=popover]').popover({
         html: true,
@@ -7,6 +7,7 @@ jQuery(document).ready(function() {
         $('[data-toggle=popover]').not(this).popover('hide');
         $(this).popover('toggle');
     });
+    
     $(document).click(function(e) {
         if (!$(e.target).is('[data-toggle=popover], .popover-title, .popover-content')) {
             $('[data-toggle=popover]').popover('hide');
@@ -28,3 +29,11 @@ jQuery(document).ready(function() {
         responsive: true
     });
 });
+
+function changeCredit(userId) {
+    $('#chageUserCredit #userId').val(userId);
+}
+
+function changePassword(userId) {
+    $('#changeUserPassword #userId').val(userId);
+}

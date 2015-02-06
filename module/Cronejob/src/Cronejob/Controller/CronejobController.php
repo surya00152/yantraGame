@@ -23,9 +23,9 @@ class CronejobController extends AbstractActionController
         $drawDate = $this->userPlugin()->getAppService()->getDate();
         if (empty($drawTime)) {
             $drawTime = '00:00:00';
+            $drawDate = $this->userPlugin()->getAppService()->getDate(true);
         }
         
-        $drawDate = $this->userPlugin()->getAppService()->getDate();
         //Get Drow Mode
         $drawMode = $this->adminPlugin()->getAdminModel()->getDrawMode();
         $jackpot = 1;

@@ -54,11 +54,18 @@ class Service implements ServiceManagerAwareInterface {
      /*
      * Get current Date in india timezone
      */
-    public function getDate()
+    public function getDate($modify = false)
     {
         $date = new \DateTIme('NOW');
         $date->setTimezone(new \DateTimeZone('Asia/Kolkata'));
+        
+        if ($modify == true) {
+            $date = $date->modify("-1 day");
+        }
+        
         return $date = $date->format("d-m-Y");
+            
+            
     }
     
      /*
@@ -68,7 +75,7 @@ class Service implements ServiceManagerAwareInterface {
     {
         $date = new \DateTIme('NOW');
         $date->setTimezone(new \DateTimeZone('Asia/Kolkata'));
-        $date = $date->modify("-15 second");
+        $date = $date->modify("-55 second");
               
         return $date = $date->format("H:i:s");
     }
@@ -80,7 +87,7 @@ class Service implements ServiceManagerAwareInterface {
     {
         $date = new \DateTIme('NOW');
         $date->setTimezone(new \DateTimeZone('Asia/Kolkata'));
-        $date = $date->modify("-20 second");
+        $date = $date->modify("-59 second");
               
         return $date = $date->format("H:i:s");
     }
@@ -98,13 +105,15 @@ class Service implements ServiceManagerAwareInterface {
     /*
      * Get Current Draw DateTime in india timezone
      */
-    public function getDrawTime()
+    public function getDrawTime($currentTime = null)
     {
         $date = new \DateTIme('NOW');
         $date->setTimezone(new \DateTimeZone('Asia/Kolkata'));
         
         $currentDate = $this->getDate();
-        $currentTime = $this->getTime();
+        if ($currentTime == null) {
+            $currentTime = $this->getTime();
+        }
         
         $minTimeArray =  $this->getTimesArray($currentDate);
         

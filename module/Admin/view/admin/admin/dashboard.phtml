@@ -1,17 +1,41 @@
 <?php
-echo $this->headLink()
-        ->appendStylesheet($this->basePath() . '/css/flip-timer.css');
+//echo $this->headLink()
+        //->appendStylesheet($this->basePath() . '/css/flip-timer.css');
 echo $this->headScript()
-        ->appendFile($this->basePath() . '/js/jquery.flipTimer.js')
-        ->appendFile($this->basePath() . '/js/myjs/dashboard.js')
+        //->appendFile($this->basePath() . '/js/jquery.flipTimer.js')
+        ->appendFile($this->basePath() . '/js/myjs/dashboard.js');
 ?>
 <div id="page-wrapper">
     <div class="row">
+        <div style="width:40%;" class="pull-left">
+            <b>Selected Mode : <?php if($drawMode['drawMode'] == 1) {
+                echo 'Minimum Mode';
+            } else if($drawMode['drawMode'] == 2) {
+                echo 'Percentage Mode';
+            } else if($drawMode['drawMode'] == 3) {
+                echo 'Manual Mode';
+            }?></b> <br />
+            <?php if(($drawMode['drawMode'] == 1 || $drawMode['drawMode'] == 3) && $drawMode['isJackpot'] == 1) { ?>
+                <b>Jackpot Mode : <?php if($drawMode['isJackpot'] == 1) {
+                    echo 'On';
+                } else {
+                    echo 'Off';
+                } ?></b>
+                <br />
+                <b>Jackpot Value : <?php echo $drawMode['jackpotValue'].'X'; ?></b>
+                <br />
+            <?php } ?>
+            
+            <?php if($drawMode['drawMode'] == 2) { ?>
+                <b>Percentage : <?php echo $drawMode['percentage'].'%'; ?></b><br />
+            <?php } ?>
+            
+            <?php if($drawMode['drawMode'] == 3) { ?>
+                <b>Yantra : <?php echo $drawMode['manual']; ?></b><br />
+            <?php } ?>
+                
+        </div>
         <div class="col-lg-12">
-            <div class="flipTimer pull-left" style="width: 50%;">
-                <div class="minutes"></div>
-                <div class="seconds"></div>
-            </div>
             <button class="btn btn-primary btn-lg pull-right" data-toggle="modal" data-target="#showDrawList" style="margin-top: 37px;margin-bottom: 18px;">
                 Show Draw Yantra
             </button>
@@ -65,7 +89,7 @@ echo $this->headScript()
                     <th><?php echo isset($rate[10])?$rate[10]['price']:0; ?></th>
                     <td><?php echo $totalRate['totalPrice']; ?></td>
                 </tr>
-                <tr>
+                <tr style="color: blue;">
                     <td>Win Price</td>
                     <th><?php echo isset($rate[1])?$rate[1]['winPrice']:0; ?></th>
                     <th><?php echo isset($rate[2])?$rate[2]['winPrice']:0; ?></th>
@@ -77,9 +101,9 @@ echo $this->headScript()
                     <th><?php echo isset($rate[8])?$rate[8]['winPrice']:0; ?></th>
                     <th><?php echo isset($rate[9])?$rate[9]['winPrice']:0; ?></th>
                     <th><?php echo isset($rate[10])?$rate[10]['winPrice']:0; ?></th>
-                    <td>NOT</td>
+                    <td>-</td>
                 </tr>
-                <tr>
+                <tr style="color: blue;">
                     <td>P/L</td>
                     <th><?php echo isset($rate[1])?$rate[1]['PL']:0; ?></th>
                     <th><?php echo isset($rate[2])?$rate[2]['PL']:0; ?></th>
@@ -91,9 +115,9 @@ echo $this->headScript()
                     <th><?php echo isset($rate[8])?$rate[8]['PL']:0; ?></th>
                     <th><?php echo isset($rate[9])?$rate[9]['PL']:0; ?></th>
                     <th><?php echo isset($rate[10])?$rate[10]['PL']:0; ?></th>
-                    <td>NOT</td>
+                    <td>-</td>
                 </tr>
-                <tr>
+                <tr style="color: red;">
                     <td>Jack Win Price</td>
                     <th><?php echo isset($rate[1])?$rate[1]['jackpotWinPrice']:0; ?></th>
                     <th><?php echo isset($rate[2])?$rate[2]['jackpotWinPrice']:0; ?></th>
@@ -105,9 +129,9 @@ echo $this->headScript()
                     <th><?php echo isset($rate[8])?$rate[8]['jackpotWinPrice']:0; ?></th>
                     <th><?php echo isset($rate[9])?$rate[9]['jackpotWinPrice']:0; ?></th>
                     <th><?php echo isset($rate[10])?$rate[10]['jackpotWinPrice']:0; ?></th>
-                    <td>NOT</td>
+                    <td>-</td>
                 </tr>
-                <tr>
+                <tr style="color: red;">
                     <td>Jack P/L</td>
                     <th><?php echo isset($rate[1])?$rate[1]['jackpotPL']:0; ?></th>
                     <th><?php echo isset($rate[2])?$rate[2]['jackpotPL']:0; ?></th>
@@ -119,7 +143,7 @@ echo $this->headScript()
                     <th><?php echo isset($rate[8])?$rate[8]['jackpotPL']:0; ?></th>
                     <th><?php echo isset($rate[9])?$rate[9]['jackpotPL']:0; ?></th>
                     <th><?php echo isset($rate[10])?$rate[10]['jackpotPL']:0; ?></th>
-                    <td>NOT</td>
+                    <td>-</td>
                 </tr>                
             </tbody>
         </table>
@@ -142,11 +166,12 @@ echo $this->headScript()
                         </select>
                     </div>
                     <div class="form-group checkbox">
-                        <input id="jackpotMode" data-toggle="toggle" data-on="Jackpot ON" data-off="Jackpot OFF" data-onstyle="success" data-offstyle="danger" type="checkbox" name="jackpotMode">
+                        <input id="jackpotMode" data-toggle="toggle" data-on="Jackpot ON" data-off="Jackpot OFF" data-onstyle="success" data-offstyle="danger" type="checkbox" name="jackpotToggle">
                     </div>
+                    <input type="hidden" name="isJackpot" id="jackpotmodeVal" value="0">
                     <div class="form-group" id="jackpotValueContent" style="display: none;">
                         <label>Select X By</label>
-                        <select class="form-control" name="jackpot">
+                        <select class="form-control" name="jackpotValue">
                             <option value="2">2X</option>
                             <option value="3">3X</option>
                             <option value="4">4X</option>
@@ -232,17 +257,17 @@ echo $this->headScript()
                     foreach ($drawYantra as $yantra){
                         ?>
                         <div style="width: 100px;margin-left: 3px;" class="pull-left">
-                            <div class="panel panel-<?php echo ($yantra['jackpot'] > 1)?'yellow':'green'; ?>">
+                            <div class="panel panel-<?php echo ($yantra['jackpot'] > 1)?'red':'green'; ?>">
                                 <div class="panel-heading text-center">
                                     <div class="row">
                                         <img width="50" src="<?php echo $this->basePath() ?>/yantraImages/<?php echo $yantra['yantraId'];?>.png">
                                     </div>
                                 </div>
 
-                                <div class="panel-footer" style="font-size: 10px;">
-                                    <b>
-                                        <span><?=$yantra['drawTime']?><?php echo ($yantra['jackpot'] > 1)?' ('.$yantra['jackpot'].'X)':''; ?></span><br />
-                                    </b>
+                                <div>
+                                    <h5>
+                                        <?php $dateArray = explode(' ',$yantra['drawTime']); echo $dateArray[1];?><?php echo ($yantra['jackpot'] > 1)?' ('.$yantra['jackpot'].'X)':''; ?>
+                                    </h5>
                                 </div>
                             </div>
                         </div>
