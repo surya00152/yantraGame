@@ -150,6 +150,7 @@ class Ticket implements ServiceManagerAwareInterface {
                 ->leftJoin(self::DATEENTITY, 'dt','with', 'dt.Id = t.dateId')
                 ->where('dt.drawDate ='.$qb->expr()->literal($drawDate))
                 ->andWhere('dt.userId ='.$userId)
+                ->orderBy('t.time','desc')
                 ->getQuery()
                 ->getArrayResult();
     }
@@ -183,8 +184,9 @@ class Ticket implements ServiceManagerAwareInterface {
                 ->andWhere('dt.userId ='.$userId)
                 //->andWhere("dy.drawTime = CONCAT(CONCAT(dt.drawDate,' '),t.time)")
                 ->groupBy('t.time')
+                ->orderBy('t.time','desc')
                 ->getQuery()
-                //->getSQL();
+               //->getSQL();
                 ->getArrayResult();
     }
     
