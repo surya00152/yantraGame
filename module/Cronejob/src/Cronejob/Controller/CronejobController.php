@@ -21,11 +21,14 @@ class CronejobController extends AbstractActionController
         //get Draw Time & Date
         $drawTime = $this->userPlugin()->getAppService()->getDrawTime();
         $drawDate = $this->userPlugin()->getAppService()->getDate();
+        //$drawTime = '01:15:00';
         if (empty($drawTime)) {
             $drawTime = '00:00:00';
-            $drawDate = $this->userPlugin()->getAppService()->getDate(true);
+            $drawDate = new \DateTime("$drawDate");//$this->userPlugin()->getAppService()->getDate(true);
+            $drawDate->modify("-1 day");
+            $drawDate = $drawDate->format("d-m-Y");
         }
-        
+                
         //Get Drow Mode
         $drawMode = $this->adminPlugin()->getAdminModel()->getDrawMode();
         $jackpot = 1;
@@ -52,6 +55,7 @@ class CronejobController extends AbstractActionController
         
         //check drow entry is exist
         $drowExist = $this->userPlugin()->getDrowModel()->drowExistByDateTime($drawDate.' '.$drawTime);
+        
         if(count($drowExist) == 0) {
             //add drow yantra deletails
             $newDrowData = array (

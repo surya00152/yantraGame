@@ -511,12 +511,36 @@ class UserPlugin extends AbstractPlugin
 
     public function createTicket($post)
     {
-        $log = "\r\n=========================";
         $response = array();
         //Get user details By token
         $userData = $this->getUserModel()->getUserByToken($post['token']);
         if (count($userData) > 0) {
-           if ($userData['ticketTime'] == $post['time']) {
+            $dashboardTime = $this->getAppService()->getUserDashboardTime();
+            $currentDate = $this->getAppService()->getDate();
+            $drowTime = $this->getAppService()->getDrawTime();
+            if (empty($drowTime)) {
+                $drowTime = '24:00:00';
+            }
+            
+            $realDate = new \DateTime($currentDate.' '.$dashboardTime);
+            $realDate->modify("+1 min");  
+            $realDate = $realDate->format('Y-m-d H:i:s');
+            
+            $compareDrawDate = new \DateTime($currentDate.' '.$drowTime);
+            $compareDrawDate = $compareDrawDate->format('Y-m-d H:i:s');            
+            
+            if (strtotime($realDate) > strtotime($compareDrawDate)) {
+                $response['status'] = 'error';
+                $response['message'] = 'Ticket time out.';
+                return $response;
+            }
+            
+            if ($drowTime == '24:00:00') {
+                $drowTime = '00:00:00';
+            }
+            
+            
+            if ($userData['ticketTime'] == $post['time']) {
                 $response['bal'] = $userData['avaiPurchaseBal'];
                 $response['yantra'] = $this->getAllYantraForUser($userData);
                 $response['status'] = 'success';
@@ -543,11 +567,6 @@ class UserPlugin extends AbstractPlugin
                   try {
                         $em->getConnection()->beginTransaction();
 
-                        $currentDate = $this->getAppService()->getDate();
-                        $drowTime = $this->getAppService()->getDrawTime();
-                        if (empty($drowTime)) {
-                            $drowTime = '00:00:00';
-                        }
                         //check date records exist if not then create new if Yes then use Id
                         $getTicketDate = $this->getTicketDateModel()->getTicketDate($userData['Id'],$currentDate);
 
@@ -803,8 +822,24 @@ class UserPlugin extends AbstractPlugin
                 $response['data'] = $daywiseReport;
                 
             } else {
-                $response['status'] = 'error';
-                $response['message'] = 'Access Denied.';
+                //Get User Ticket Status
+                $daywiseReport = array();
+                //get Day wise report
+                $currentDate = $this->getAppService()->getDate();
+                $daywiseReport = $this->getTransactionModel()->getDaywiseReport($userData['Id'],$post['startDate'],$post['endDate']);
+                
+                if(count($daywiseReport) > 0) {
+                    foreach ($daywiseReport as $rKey => $report) {
+                        $daywiseReport[$rKey]['creditBal'] = 0;
+                        $daywiseReport[$rKey]['debitBal'] = 0;
+                        
+                        if ($report['transDate'] == $currentDate) {
+                            $daywiseReport[$rKey]['closeBal'] = $userData['avaiTransBal'];
+                        }
+                    }
+                }
+                $response['status'] = 'success';
+                $response['data'] = $daywiseReport;
             }            
         } else {
             $response['status'] = 'error';
@@ -941,6 +976,23 @@ class UserPlugin extends AbstractPlugin
                         try {
                             $em->getConnection()->beginTransaction();
                             
+                            //check date records exist if not then create new if Yes then use Id
+                            $getTicketDate = $this->getTicketDateModel()->getTicketDate($userData['Id'],$currentDate);
+
+                            if (count($getTicketDate) == 0) {
+                                //create Date Records
+                                $dateData  = array (
+                                    'userId' => $userData['Id'],
+                                    'drawDate' => $currentDate,
+                                    'openingBal' => $userData['avaiTransBal'],
+                                );
+
+                                $getDateEntity = $this->getTicketDateModel()->createTicketDate($dateData);
+                                $dateId = $getDateEntity->Id;
+                            } else {
+                                $dateId = $getTicketDate['Id'];
+                            }
+                            
                             $localUser = array (
                                 'avaiPurchaseBal' => $post['balance'],
                                 'totalWinBal' => 0,
@@ -967,17 +1019,18 @@ class UserPlugin extends AbstractPlugin
                             $this->getNotificationModel()->createNotification($notificationData);
                             
                             $transactionData = array (
+                                'dateId' => $dateId,
                                 'userId' => $userData['Id'],
                                 'agentId' => $localUserData['Id'],
                                 'transBalance' => $post['balance'],
                                 'transType' => 'Credit',
-                                'date' => $this->getAppService()->getDateTime()
+                                'time' => $this->getAppService()->getTime()
                             );
                             //create Transaction report
                             $this->getTransactionModel()->createTransaction($transactionData);
                             
                             $response['status'] = 'success';
-                            $response['message'] = 'Balance tranfer successfully.';
+                            $response['message'] = 'Balance transfer successfully.';
 
                             $em->getConnection()->commit();
                         } catch (\Exception $e) {
@@ -1024,7 +1077,24 @@ class UserPlugin extends AbstractPlugin
                     $em = $this->getController()->getServiceLocator()->get('doctrine.entitymanager.orm_default');
                     try {
                         $em->getConnection()->beginTransaction();
+                        
+                        //check date records exist if not then create new if Yes then use Id
+                        $getTicketDate = $this->getTicketDateModel()->getTicketDate($userData['Id'],$currentDate);
 
+                        if (count($getTicketDate) == 0) {
+                            //create Date Records
+                            $dateData  = array (
+                                'userId' => $userData['Id'],
+                                'drawDate' => $currentDate,
+                                'openingBal' => $userData['avaiTransBal'],
+                            );
+
+                            $getDateEntity = $this->getTicketDateModel()->createTicketDate($dateData);
+                            $dateId = $getDateEntity->Id;
+                        } else {
+                            $dateId = $getTicketDate['Id'];
+                        }
+                            
                         $localUser = array (
                             'avaiPurchaseBal' => $localUserData['avaiPurchaseBal'] - $localUserData['balReq'],
                             'balReqCode' => 0,
@@ -1052,11 +1122,12 @@ class UserPlugin extends AbstractPlugin
                         $this->getNotificationModel()->createNotification($notificationData);
 
                         $transactionData = array (
+                            'dateId' => $dateId,
                             'userId' => $userData['Id'],
                             'agentId' => $localUserData['Id'],
                             'transBalance' => $localUserData['balReq'],
                             'transType' => 'Debit',
-                            'date' => $this->getAppService()->getDateTime()
+                            'time' => $this->getAppService()->getTime()
                         );
                         //create Transaction report
                         $this->getTransactionModel()->createTransaction($transactionData);

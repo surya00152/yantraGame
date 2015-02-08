@@ -21,7 +21,12 @@ class Transaction {
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $Id;
-
+    
+    /**
+     * @ORM\Column(length=11);
+     */
+    protected $dateId;
+    
     /**
      * @ORM\Column(length=11);
      */
@@ -43,9 +48,9 @@ class Transaction {
     protected $transType;
 
     /**
-     * @ORM\Column(length=20);
+     * @ORM\Column(length=11);
      */
-    protected $date;
+    protected $time;
 
     /**
      * Magic getter to expose protected properties.

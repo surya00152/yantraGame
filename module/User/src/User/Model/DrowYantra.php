@@ -57,12 +57,19 @@ class DrowYantra implements ServiceManagerAwareInterface {
      * Get all drow yantra
      */
     public function getAllDrowYantra($date,$time = null) {
+        $pastDate = new \DateTime($date);
+        $pastDate->modify("-1 day");
+        $pastDate = $pastDate->format('d-m-Y');
+        $pastDate = $pastDate." 00:00:00";
+        //exit;
+        
         $qb = $this->entityManager->createQueryBuilder();
         if ($time !== null) {
             return $qb->select('dy')
                 ->from(self::ENTITY, 'dy')
                 ->where($qb->expr()->like('dy.drawTime', $qb->expr()->literal($date. '%')))
-                ->where($qb->expr()->notLike('dy.drawTime', $qb->expr()->literal('%'.$time)))
+                ->andWhere($qb->expr()->notLike('dy.drawTime', $qb->expr()->literal('%'.$time)))
+                ->orWhere('dy.drawTime = '.$qb->expr()->literal($pastDate))
                 ->orderBy('dy.Id','desc')
                 ->getQuery()
                 ->getArrayResult();
@@ -70,6 +77,7 @@ class DrowYantra implements ServiceManagerAwareInterface {
             return $qb->select('dy')
                 ->from(self::ENTITY, 'dy')
                 ->where($qb->expr()->like('dy.drawTime', $qb->expr()->literal($date. '%')))
+                ->orWhere('dy.drawTime = '.$qb->expr()->literal($pastDate))
                 ->orderBy('dy.Id','desc')
                 ->getQuery()
                 ->getArrayResult();
