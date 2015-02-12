@@ -1,5 +1,29 @@
 $(document).ready(function() {
     
+    $(".confirm").button().click(function(e) {
+        e.preventDefault();
+        var target = $(this).attr("link");
+        var title = 'Change User Account status';
+        var content = 'Are you sure want to change account status?';
+
+        $('<div>' + content + '</div>'). dialog({
+            draggable: false,
+            modal: true,
+            resizable: false,
+            width: 'auto',
+            title: title,
+            buttons: {
+                "Confirm": function() {
+                    window.location.href = target;
+                },
+                "Cancel": function() {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+    });
+  
     $('[data-toggle=popover]').popover({
         html: true,
         trigger: 'manual'
