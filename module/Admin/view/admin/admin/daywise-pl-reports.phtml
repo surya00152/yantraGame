@@ -1,0 +1,62 @@
+<?php
+echo $this->headScript()
+        ->appendFile($this->basePath() . '/js/myjs/daywiseReport.js')
+?>
+<div id="page-wrapper">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Profit/Loss Reports</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <b>Purchase Reports</b>
+                    <span class="pull-right">
+                        <form name="daywise" method="post">
+                            <b>Start Date : </b><input type="text" id="startDate" name="startDate">
+                            <b>End Date : </b><input type="text" id="endDate" name="endDate">
+                            <button class="btn btn-success" type="submit">Search</button>
+                        </form>
+                    </span>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="dataTable_wrapper">
+                        <table id="daywiseRepoTbl" class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%;">Draw Date</th>
+                                    <th style="width: 5%;">P/L</th>
+                                    <th style="width: 5%;">Purchase</th>
+                                    <th style="width: 5%;">Win Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                if (count($daywisePlReport) > 0) {
+                                    foreach ($daywisePlReport as $report) {
+                                        ?>
+                                        <tr>
+                                            <td><?=$report['date']?></td>
+                                            <td><?=$report['pl']?></td>
+                                            <td><?=$report['purchase']?></td>
+                                            <td><?=$report['winPrice']?></td>
+                                        </tr>
+                                        <?php
+                                    }
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+        <!-- /.col-lg-12 -->
+    </div><!-- /#page-wrapper -->
