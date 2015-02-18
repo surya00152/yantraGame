@@ -49,6 +49,11 @@ class AdminController extends AbstractActionController
         if (!$this->adminPlugin()->isAdminLogin()) {
             return $this->redirect()->toUrl('/public/admin/login');
         }
+        
+        //get users Details
+        $data['usersData'] = $this->userPlugin()->getUserModel()->getUsersDetailsForAdmin();
+        //echo '<pre>';print_r($data);exit;
+        return new ViewModel($data);
     }
     
     /*
@@ -87,7 +92,7 @@ class AdminController extends AbstractActionController
             return $this->redirect()->toUrl('/public/admin/login');
         }
         
-        $currentTime = $this->userPlugin()->getAppService()->getTime();
+        $currentTime = $this->userPlugin()->getAppService()->getRealTime();
         $drawTime = $this->userPlugin()->getAppService()->getDrawTime();
         $drawDate = $this->userPlugin()->getAppService()->getDate();
         
@@ -131,6 +136,17 @@ class AdminController extends AbstractActionController
                 $newYantraRate[$rate['yantraId']] = $rate;
             }            
         }
+        
+        if ($this->getRequest()->isXmlHttpRequest()) { 
+            exit(json_encode(array(
+                        'data' => $newYantraRate,
+                        'totalQnt' => $totalRate['totalQnt'],
+                        'totalPrice' => $totalRate['totalPrice'],
+                        'remainigTime' => $differenceInSeconds
+                    )
+                ));
+        }
+        
         $drawMode = $this->adminPlugin()->getAdminModel()->getDrawMode();
         return new ViewModel(array(
             'rate' => $newYantraRate,

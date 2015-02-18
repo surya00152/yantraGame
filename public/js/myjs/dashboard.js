@@ -1,3 +1,4 @@
+
 $(document).ready(function() {
     //CounterInit(100);
     $('#drawMode').change(function(){
@@ -41,6 +42,31 @@ $(document).ready(function() {
            $('#jackpotmodeVal').val('0');
            $('#jackpotValueContent').hide();
        }
-    });
-    
+    });    
 });
+
+function refreshTable() {
+    //Refresh Table
+    $.ajax({
+        url: '/public/admin/dashboard',
+        type: 'GET',
+        success: function(data)
+        {
+            var json = jQuery.parseJSON(data);
+            if (Object.keys(json.data).length > 0) {
+                $.each(json.data,function(key,val){
+                    $.each(val,function(vKey,vVal) {
+                        $('#'+vKey+'-'+key).html(vVal);
+                    });
+                });
+            }
+            $('#totalQnt').html(json.totalQnt);
+            $('#totalPrice').html(json.totalPrice);
+            CounterInit(json.remainigTime);
+        },
+        error: function(jqXHR, textStatus, errorThrown)
+        {
+            alert('Table refresh fail.Please try again.');
+        }
+    });
+}

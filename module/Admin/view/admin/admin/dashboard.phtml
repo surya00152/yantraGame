@@ -69,7 +69,7 @@ echo $this->headScript()
             </div>
         </div>
         <div class="pull-right" style="margin-top:-87px;">
-            <button onclick="window.location.reload();" class="btn btn-warning btn-lg pull-left" style="margin-top: 37px;margin-bottom: 18px;margin-right:21px;">
+            <button onclick="refreshTable()" class="btn btn-warning btn-lg pull-left" style="margin-top: 37px;margin-bottom: 18px;margin-right:21px;">
                 Refresh
             </button>
             <a class="btn btn-primary btn-lg pull-right" href="<?php echo $this->basePath()?>/admin/showDrawYantra" target="_new" style="margin-top: 37px;margin-bottom: 18px;">
@@ -99,86 +99,86 @@ echo $this->headScript()
             <tbody>
                 <tr>
                     <td>Quantity</td>
-                    <th><?php echo isset($rate[1])?$rate[1]['quantity']:0; ?></th>
-                    <th><?php echo isset($rate[2])?$rate[2]['quantity']:0; ?></th>
-                    <th><?php echo isset($rate[3])?$rate[3]['quantity']:0; ?></th>
-                    <th><?php echo isset($rate[4])?$rate[4]['quantity']:0; ?></th>
-                    <th><?php echo isset($rate[5])?$rate[5]['quantity']:0; ?></th>
-                    <th><?php echo isset($rate[6])?$rate[6]['quantity']:0; ?></th>
-                    <th><?php echo isset($rate[7])?$rate[7]['quantity']:0; ?></th>
-                    <th><?php echo isset($rate[8])?$rate[8]['quantity']:0; ?></th>
-                    <th><?php echo isset($rate[9])?$rate[9]['quantity']:0; ?></th>
-                    <th><?php echo isset($rate[10])?$rate[10]['quantity']:0; ?></th>
-                    <td><?php echo $totalRate['totalQnt']; ?></td>
+                    <th id="quantity-1"><?php echo isset($rate[1])?$rate[1]['quantity']:0; ?></th>
+                    <th id="quantity-2"><?php echo isset($rate[2])?$rate[2]['quantity']:0; ?></th>
+                    <th id="quantity-3"><?php echo isset($rate[3])?$rate[3]['quantity']:0; ?></th>
+                    <th id="quantity-4"><?php echo isset($rate[4])?$rate[4]['quantity']:0; ?></th>
+                    <th id="quantity-5"><?php echo isset($rate[5])?$rate[5]['quantity']:0; ?></th>
+                    <th id="quantity-6"><?php echo isset($rate[6])?$rate[6]['quantity']:0; ?></th>
+                    <th id="quantity-7"><?php echo isset($rate[7])?$rate[7]['quantity']:0; ?></th>
+                    <th id="quantity-8"><?php echo isset($rate[8])?$rate[8]['quantity']:0; ?></th>
+                    <th id="quantity-9"><?php echo isset($rate[9])?$rate[9]['quantity']:0; ?></th>
+                    <th id="quantity-10"><?php echo isset($rate[10])?$rate[10]['quantity']:0; ?></th>
+                    <td id="totalQnt"><?php echo $totalRate['totalQnt']; ?></td>
                 </tr>
                 <tr>
                     <td>Price</td>
-                    <th><?php echo isset($rate[1])?$rate[1]['price']:0; ?></th>
-                    <th><?php echo isset($rate[2])?$rate[2]['price']:0; ?></th>
-                    <th><?php echo isset($rate[3])?$rate[3]['price']:0; ?></th>
-                    <th><?php echo isset($rate[4])?$rate[4]['price']:0; ?></th>
-                    <th><?php echo isset($rate[5])?$rate[5]['price']:0; ?></th>
-                    <th><?php echo isset($rate[6])?$rate[6]['price']:0; ?></th>
-                    <th><?php echo isset($rate[7])?$rate[7]['price']:0; ?></th>
-                    <th><?php echo isset($rate[8])?$rate[8]['price']:0; ?></th>
-                    <th><?php echo isset($rate[9])?$rate[9]['price']:0; ?></th>
-                    <th><?php echo isset($rate[10])?$rate[10]['price']:0; ?></th>
-                    <td><?php echo $totalRate['totalPrice']; ?></td>
+                    <th id="price-1"><?php echo isset($rate[1])?$rate[1]['price']:0; ?></th>
+                    <th id="price-2"><?php echo isset($rate[2])?$rate[2]['price']:0; ?></th>
+                    <th id="price-3"><?php echo isset($rate[3])?$rate[3]['price']:0; ?></th>
+                    <th id="price-4"><?php echo isset($rate[4])?$rate[4]['price']:0; ?></th>
+                    <th id="price-5"><?php echo isset($rate[5])?$rate[5]['price']:0; ?></th>
+                    <th id="price-6"><?php echo isset($rate[6])?$rate[6]['price']:0; ?></th>
+                    <th id="price-7"><?php echo isset($rate[7])?$rate[7]['price']:0; ?></th>
+                    <th id="price-8"><?php echo isset($rate[8])?$rate[8]['price']:0; ?></th>
+                    <th id="price-9"><?php echo isset($rate[9])?$rate[9]['price']:0; ?></th>
+                    <th id="price-10"><?php echo isset($rate[10])?$rate[10]['price']:0; ?></th>
+                    <td id="totalPrice"><?php echo $totalRate['totalPrice']; ?></td>
                 </tr>
                 <tr style="color: blue;">
                     <td>Win Price</td>
-                    <th><?php echo isset($rate[1])?$rate[1]['winPrice']:0; ?></th>
-                    <th><?php echo isset($rate[2])?$rate[2]['winPrice']:0; ?></th>
-                    <th><?php echo isset($rate[3])?$rate[3]['winPrice']:0; ?></th>
-                    <th><?php echo isset($rate[4])?$rate[4]['winPrice']:0; ?></th>
-                    <th><?php echo isset($rate[5])?$rate[5]['winPrice']:0; ?></th>
-                    <th><?php echo isset($rate[6])?$rate[6]['winPrice']:0; ?></th>
-                    <th><?php echo isset($rate[7])?$rate[7]['winPrice']:0; ?></th>
-                    <th><?php echo isset($rate[8])?$rate[8]['winPrice']:0; ?></th>
-                    <th><?php echo isset($rate[9])?$rate[9]['winPrice']:0; ?></th>
-                    <th><?php echo isset($rate[10])?$rate[10]['winPrice']:0; ?></th>
+                    <th id="winPrice-1"><?php echo isset($rate[1])?$rate[1]['winPrice']:0; ?></th>
+                    <th id="winPrice-2"><?php echo isset($rate[2])?$rate[2]['winPrice']:0; ?></th>
+                    <th id="winPrice-3"><?php echo isset($rate[3])?$rate[3]['winPrice']:0; ?></th>
+                    <th id="winPrice-4"><?php echo isset($rate[4])?$rate[4]['winPrice']:0; ?></th>
+                    <th id="winPrice-5"><?php echo isset($rate[5])?$rate[5]['winPrice']:0; ?></th>
+                    <th id="winPrice-6"><?php echo isset($rate[6])?$rate[6]['winPrice']:0; ?></th>
+                    <th id="winPrice-7"><?php echo isset($rate[7])?$rate[7]['winPrice']:0; ?></th>
+                    <th id="winPrice-8"><?php echo isset($rate[8])?$rate[8]['winPrice']:0; ?></th>
+                    <th id="winPrice-9"><?php echo isset($rate[9])?$rate[9]['winPrice']:0; ?></th>
+                    <th id="winPrice-10"><?php echo isset($rate[10])?$rate[10]['winPrice']:0; ?></th>
                     <td>-</td>
                 </tr>
                 <tr style="color: blue;">
                     <td>P/L</td>
-                    <th><?php echo isset($rate[1])?$rate[1]['PL']:0; ?></th>
-                    <th><?php echo isset($rate[2])?$rate[2]['PL']:0; ?></th>
-                    <th><?php echo isset($rate[3])?$rate[3]['PL']:0; ?></th>
-                    <th><?php echo isset($rate[4])?$rate[4]['PL']:0; ?></th>
-                    <th><?php echo isset($rate[5])?$rate[5]['PL']:0; ?></th>
-                    <th><?php echo isset($rate[6])?$rate[6]['PL']:0; ?></th>
-                    <th><?php echo isset($rate[7])?$rate[7]['PL']:0; ?></th>
-                    <th><?php echo isset($rate[8])?$rate[8]['PL']:0; ?></th>
-                    <th><?php echo isset($rate[9])?$rate[9]['PL']:0; ?></th>
-                    <th><?php echo isset($rate[10])?$rate[10]['PL']:0; ?></th>
+                    <th id="PL-1"><?php echo isset($rate[1])?$rate[1]['PL']:0; ?></th>
+                    <th id="PL-2"><?php echo isset($rate[2])?$rate[2]['PL']:0; ?></th>
+                    <th id="PL-3"><?php echo isset($rate[3])?$rate[3]['PL']:0; ?></th>
+                    <th id="PL-4"><?php echo isset($rate[4])?$rate[4]['PL']:0; ?></th>
+                    <th id="PL-5"><?php echo isset($rate[5])?$rate[5]['PL']:0; ?></th>
+                    <th id="PL-6"><?php echo isset($rate[6])?$rate[6]['PL']:0; ?></th>
+                    <th id="PL-7"><?php echo isset($rate[7])?$rate[7]['PL']:0; ?></th>
+                    <th id="PL-8"><?php echo isset($rate[8])?$rate[8]['PL']:0; ?></th>
+                    <th id="PL-9"><?php echo isset($rate[9])?$rate[9]['PL']:0; ?></th>
+                    <th id="PL-10"><?php echo isset($rate[10])?$rate[10]['PL']:0; ?></th>
                     <td>-</td>
                 </tr>
                 <tr style="color: red;">
                     <td>Jack Win Price</td>
-                    <th><?php echo isset($rate[1])?$rate[1]['jackpotWinPrice']:0; ?></th>
-                    <th><?php echo isset($rate[2])?$rate[2]['jackpotWinPrice']:0; ?></th>
-                    <th><?php echo isset($rate[3])?$rate[3]['jackpotWinPrice']:0; ?></th>
-                    <th><?php echo isset($rate[4])?$rate[4]['jackpotWinPrice']:0; ?></th>
-                    <th><?php echo isset($rate[5])?$rate[5]['jackpotWinPrice']:0; ?></th>
-                    <th><?php echo isset($rate[6])?$rate[6]['jackpotWinPrice']:0; ?></th>
-                    <th><?php echo isset($rate[7])?$rate[7]['jackpotWinPrice']:0; ?></th>
-                    <th><?php echo isset($rate[8])?$rate[8]['jackpotWinPrice']:0; ?></th>
-                    <th><?php echo isset($rate[9])?$rate[9]['jackpotWinPrice']:0; ?></th>
-                    <th><?php echo isset($rate[10])?$rate[10]['jackpotWinPrice']:0; ?></th>
+                    <th id="jackpotWinPrice-1"><?php echo isset($rate[1])?$rate[1]['jackpotWinPrice']:0; ?></th>
+                    <th id="jackpotWinPrice-2"><?php echo isset($rate[2])?$rate[2]['jackpotWinPrice']:0; ?></th>
+                    <th id="jackpotWinPrice-3"><?php echo isset($rate[3])?$rate[3]['jackpotWinPrice']:0; ?></th>
+                    <th id="jackpotWinPrice-4"><?php echo isset($rate[4])?$rate[4]['jackpotWinPrice']:0; ?></th>
+                    <th id="jackpotWinPrice-5"><?php echo isset($rate[5])?$rate[5]['jackpotWinPrice']:0; ?></th>
+                    <th id="jackpotWinPrice-6"><?php echo isset($rate[6])?$rate[6]['jackpotWinPrice']:0; ?></th>
+                    <th id="jackpotWinPrice-7"><?php echo isset($rate[7])?$rate[7]['jackpotWinPrice']:0; ?></th>
+                    <th id="jackpotWinPrice-8"><?php echo isset($rate[8])?$rate[8]['jackpotWinPrice']:0; ?></th>
+                    <th id="jackpotWinPrice-9"><?php echo isset($rate[9])?$rate[9]['jackpotWinPrice']:0; ?></th>
+                    <th id="jackpotWinPrice-10"><?php echo isset($rate[10])?$rate[10]['jackpotWinPrice']:0; ?></th>
                     <td>-</td>
                 </tr>
                 <tr style="color: red;">
                     <td>Jack P/L</td>
-                    <th><?php echo isset($rate[1])?$rate[1]['jackpotPL']:0; ?></th>
-                    <th><?php echo isset($rate[2])?$rate[2]['jackpotPL']:0; ?></th>
-                    <th><?php echo isset($rate[3])?$rate[3]['jackpotPL']:0; ?></th>
-                    <th><?php echo isset($rate[4])?$rate[4]['jackpotPL']:0; ?></th>
-                    <th><?php echo isset($rate[5])?$rate[5]['jackpotPL']:0; ?></th>
-                    <th><?php echo isset($rate[6])?$rate[6]['jackpotPL']:0; ?></th>
-                    <th><?php echo isset($rate[7])?$rate[7]['jackpotPL']:0; ?></th>
-                    <th><?php echo isset($rate[8])?$rate[8]['jackpotPL']:0; ?></th>
-                    <th><?php echo isset($rate[9])?$rate[9]['jackpotPL']:0; ?></th>
-                    <th><?php echo isset($rate[10])?$rate[10]['jackpotPL']:0; ?></th>
+                    <th id="jackpotPL-1"><?php echo isset($rate[1])?$rate[1]['jackpotPL']:0; ?></th>
+                    <th id="jackpotPL-2"><?php echo isset($rate[2])?$rate[2]['jackpotPL']:0; ?></th>
+                    <th id="jackpotPL-3"><?php echo isset($rate[3])?$rate[3]['jackpotPL']:0; ?></th>
+                    <th id="jackpotPL-4"><?php echo isset($rate[4])?$rate[4]['jackpotPL']:0; ?></th>
+                    <th id="jackpotPL-5"><?php echo isset($rate[5])?$rate[5]['jackpotPL']:0; ?></th>
+                    <th id="jackpotPL-6"><?php echo isset($rate[6])?$rate[6]['jackpotPL']:0; ?></th>
+                    <th id="jackpotPL-7"><?php echo isset($rate[7])?$rate[7]['jackpotPL']:0; ?></th>
+                    <th id="jackpotPL-8"><?php echo isset($rate[8])?$rate[8]['jackpotPL']:0; ?></th>
+                    <th id="jackpotPL-9"><?php echo isset($rate[9])?$rate[9]['jackpotPL']:0; ?></th>
+                    <th id="jackpotPL-10"><?php echo isset($rate[10])?$rate[10]['jackpotPL']:0; ?></th>
                     <td>-</td>
                 </tr>                
             </tbody>

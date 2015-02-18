@@ -100,6 +100,18 @@ class User implements ServiceManagerAwareInterface {
                 ->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
     
+     /**
+     * get user by phone no
+     */
+    public function getUsersDetailsForAdmin() {
+        $qb = $this->entityManager->createQueryBuilder();
+        return $qb->select('count(u.Id) as totalUsers,u.userRoll,SUM(u.avaiPurchaseBal) as localBal,SUM(u.avaiTransBal) as agentBal')
+                ->from(self::ENTITY, 'u')
+                ->groupBy('u.userRoll')
+                ->getQuery()
+                ->getArrayResult();
+    }
+    
     /**
      * get user by login Token
      */

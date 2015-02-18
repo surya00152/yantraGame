@@ -81,6 +81,17 @@ class Service implements ServiceManagerAwareInterface {
     }
     
     /*
+     * Get Real current Time in india timezone
+     */
+    public function getRealTime()
+    {
+        $date = new \DateTIme('NOW');
+        $date->setTimezone(new \DateTimeZone('Asia/Kolkata'));
+                      
+        return $date = $date->format("H:i:s");
+    }
+    
+    /*
      * Get current Time in india timezone
      */
     public function getUserDashboardTime()
