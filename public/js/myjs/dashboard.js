@@ -22,6 +22,14 @@ $(document).ready(function() {
             /* manual Mode*/
             $('#manualContent').show();
             $('#percentageContent').hide();
+        }else if($(this).val() == 4) {
+            $('#jackpotMode').attr('checked',false);
+            $('#jackpotMode').attr('disabled',true).closest('.checkbox').addClass('disabled').hide();
+            $('#jackpotmodeVal').val('0');
+            /* percentage Mode*/
+            $('#jackpotValueContent').hide();
+            $('#manualContent').hide();
+            $('#percentageContent').hide();
         }
     });
     

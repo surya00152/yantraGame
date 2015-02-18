@@ -23,6 +23,8 @@ echo $this->headScript()
                 echo 'Percentage Mode';
             } else if($drawMode['drawMode'] == 3) {
                 echo 'Manual Mode';
+            }else if($drawMode['drawMode'] == 4) {
+                echo 'Random Mode';
             }?></b> <br />
             <?php if(($drawMode['drawMode'] == 1 || $drawMode['drawMode'] == 3) && $drawMode['isJackpot'] == 1) { ?>
                 <b>Jackpot Mode : <?php if($drawMode['isJackpot'] == 1) {
@@ -70,9 +72,9 @@ echo $this->headScript()
             <button onclick="window.location.reload();" class="btn btn-warning btn-lg pull-left" style="margin-top: 37px;margin-bottom: 18px;margin-right:21px;">
                 Refresh
             </button>
-            <button class="btn btn-primary btn-lg pull-right" data-toggle="modal" data-target="#showDrawList" style="margin-top: 37px;margin-bottom: 18px;">
+            <a class="btn btn-primary btn-lg pull-right" href="<?php echo $this->basePath()?>/admin/showDrawYantra" target="_new" style="margin-top: 37px;margin-bottom: 18px;">
                 Show Draw Yantra
-            </button>
+            </a>
         </div>
     </div>
     <!-- /.row -->
@@ -191,19 +193,20 @@ echo $this->headScript()
             <form role="form" id="drawModefrm" method="post" action="<?php echo $this->basePath() ?>/admin/saveDrowMode">
                 <div class="panel-body">
                 
-                    <div class="form-group">
+                    <div class="form-group pull-left" style="width:25%;">
                         <label>Select Draw Mode</label>
                         <select class="form-control" name="drawMode" id="drawMode">
                             <option value="1">Minimum Mode</option>
                             <option value="2">Percentage Mode</option>                            
                             <option value="3">Manual Mode</option>
+                            <option value="4">Random Mode</option>
                         </select>
                     </div>
-                    <div class="form-group checkbox">
+                    <div class="form-group checkbox pull-left" style="width:25%;">
                         <input id="jackpotMode" data-toggle="toggle" data-on="Jackpot ON" data-off="Jackpot OFF" data-onstyle="success" data-offstyle="danger" type="checkbox" name="jackpotToggle">
                     </div>
                     <input type="hidden" name="isJackpot" id="jackpotmodeVal" value="0">
-                    <div class="form-group" id="jackpotValueContent" style="display: none;">
+                    <div class="form-group pull-left" id="jackpotValueContent" style="display: none;width:25%;">
                         <label>Select X By</label>
                         <select class="form-control" name="jackpotValue">
                             <option value="2">2X</option>
@@ -212,7 +215,7 @@ echo $this->headScript()
                             <option value="5">5X</option>
                         </select>
                     </div>
-                    <div class="form-group" id="manualContent" style="display: none;">
+                    <div class="form-group pull-left" id="manualContent" style="display: none;width:25%;">
                         <label>Select Yantra</label>
                         <select class="form-control" name="manual">
                             <option value="1">1</option>
@@ -227,7 +230,7 @@ echo $this->headScript()
                             <option value="10">10</option>
                         </select>
                     </div>
-                    <div class="form-group" id="percentageContent" style="display: none;">
+                    <div class="form-group pull-left" id="percentageContent" style="display: none;width:25%;">
                         <label>Percentage</label>
                         <select class="form-control" name="percentage">
                             <option value="5">5%</option>
@@ -247,74 +250,5 @@ echo $this->headScript()
                 </div>
             </form>
         </div>
-
-        <!--<div class="panel panel-red pull-left" style="width: 40%;margin-left: 30px;">
-            <div class="panel-heading">
-                Jackpot Panel
-            </div>
-            <div class="panel-body">
-
-                <form role="form" id="jackpotfrm">
-                    <div class="form-group checkbox">
-                        <input id="jackpotMode" data-toggle="toggle" data-on="Jackpot ON" data-off="Jackpot OFF" data-onstyle="success" data-offstyle="danger" type="checkbox" name="jackpot">
-                    </div>
-                    <div class="form-group" id="jackpotValueContent" style="display: none;">
-                        <label>Select X By</label>
-                        <select class="form-control" name="jackpotValue">
-                            <option value="2">2X</option>
-                            <option value="3">3X</option>
-                            <option value="4">4X</option>
-                            <option value="5">5X</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="panel-footer">
-                <button type="button" class="btn btn-outline btn-primary btn-lg btn-block">Save Jackpot</button>
-            </div>
-        </div>-->
-        <!-- /.col-lg-4 -->
-
     </div>
-</div>
-<!-- /#page-wrapper -->
-<div class="modal fade" id="showDrawList" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">Drow Yantra List</h4>
-            </div>
-            <div class="modal-body">
-                <div class="text-center" style="height:350px;margin-left:26px;overflow: scroll;">
-                <?php if(count($drawYantra) > 0) {
-                    foreach ($drawYantra as $yantra){
-                        ?>
-                        <div style="width: 100px;margin-left: 3px;" class="pull-left">
-                            <div class="panel panel-<?php echo ($yantra['jackpot'] > 1)?'red':'green'; ?>">
-                                <div class="panel-heading text-center">
-                                    <div class="row">
-                                        <img width="50" src="<?php echo $this->basePath() ?>/yantraImages/<?php echo $yantra['yantraId'];?>.png">
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <h5>
-                                        <?php $dateArray = explode(' ',$yantra['drawTime']); echo $dateArray[1];?><?php echo ($yantra['jackpot'] > 1)?' ('.$yantra['jackpot'].'X)':''; ?>
-                                    </h5>
-                                </div>
-                            </div>
-                        </div>
-                        <?php
-                    }
-                } ?>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-        <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
 </div>

@@ -43,7 +43,7 @@ echo $this->headScript()
                                             <td><?php echo !empty($report['Lname'])?$report['Lname']:$report['Aname'];?></td>
                                             <td><?php echo ($report['transType']=='Credit')?'Debit':'Credit'; ?></td>
                                             <td><?=$report['transBalance']?></td>
-                                            <td><?=$report['time']?></td>
+                                            <td><?=date('h:i a',strtotime($report['time']))?></td>
                                         </tr>
                                         <?php
                                     }

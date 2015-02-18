@@ -137,8 +137,8 @@ class UserPlugin extends AbstractPlugin
                 $userData['userRoll'] = 'local';
                 $userData['deviceType'] = 'Android';
                 $userData['accountStatus'] = 'Active';
-                $userData['avaiPurchaseBal'] = '50000';
-                $userData['totalPurchaseBal'] = '50000';
+                $userData['avaiPurchaseBal'] = '100';
+                $userData['totalPurchaseBal'] = '100';
                 $userData['avaiWinBal'] = '0';
                 $userData['totalWinBal'] = '0';
                 $userData['avaiTransBal'] = '0';

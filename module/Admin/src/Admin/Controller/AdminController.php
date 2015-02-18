@@ -64,7 +64,20 @@ class AdminController extends AbstractActionController
             
        return $this->redirect()->toUrl('/public/admin/login');
     }
-        
+    
+    /*
+     * Admin show draw yantra
+     */
+    public function showDrawYantraAction() {
+        if (!$this->adminPlugin()->isAdminLogin()) {
+            return $this->redirect()->toUrl('/public/admin/login');
+        }
+        $drawDate = $this->userPlugin()->getAppService()->getDate();
+        $data['drawYantra'] = $this->userPlugin()->getDrowModel()->getAllDrowYantra($drawDate);
+        return new ViewModel($data);
+    }
+
+
     /*
      * Admin dashboard
      */
@@ -118,12 +131,10 @@ class AdminController extends AbstractActionController
                 $newYantraRate[$rate['yantraId']] = $rate;
             }            
         }
-        $drawYantra = $this->userPlugin()->getDrowModel()->getAllDrowYantra($drawDate);
         $drawMode = $this->adminPlugin()->getAdminModel()->getDrawMode();
         return new ViewModel(array(
             'rate' => $newYantraRate,
             'totalRate' => $totalRate,
-            'drawYantra' => $drawYantra,
             'currentTime' => $currentTime,
             'drawMode' => $drawMode,
             'remainigTime' => $differenceInSeconds)
@@ -394,7 +405,7 @@ class AdminController extends AbstractActionController
         $post = $this->getRequest()->getPost();
         
         $isValid = false;    
-        if ($post['drawMode'] >= 1 && $post['drawMode'] <= 3) {
+        if ($post['drawMode'] >= 1 && $post['drawMode'] <= 4) {
             if (isset($post['manual'])) {
                 if ($post['manual'] >= 1 && $post['manual'] <= 10) {
                     $isValid = true;
@@ -881,14 +892,14 @@ class AdminController extends AbstractActionController
                 
                 if (count($getUserData) == 0) {
                     $newUserData = array (
-                        'userRoll' => $post['userRoll'],
+                        'userRoll' => 'agent',//$post['userRoll'],
                         'name' => $post['name'],
                         'phoneNo' => $post['phoneNo'],
                         'password' => sha1($post['password']),
                         'accountStatus' => 'Active',
                         'deviceType' => 'Andorid',
-                        'avaiTransBal' => 0,
-                        'totalTransBal' => 0,
+                        'avaiTransBal' => !empty($post['credit'])?$post['credit']:0,
+                        'totalTransBal' => !empty($post['credit'])?$post['credit']:0,
                         'balReq' => 0,
                     );            
 

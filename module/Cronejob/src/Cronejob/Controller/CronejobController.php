@@ -51,6 +51,10 @@ class CronejobController extends AbstractActionController
             if($drawMode['isJackpot'] == 1 && $drawMode['jackpotValue'] > 1) {
                 $jackpot = $drawMode['jackpotValue'];
             }
+        } else if($drawMode['drawMode'] == 4) {
+            //Random mode selected yantra
+            $yantraId = rand(1,10);
+            
         }
         //check drow entry is exist
         $drowExist = $this->userPlugin()->getDrowModel()->drowExistByDateTime($drawDate.' '.$drawTime);

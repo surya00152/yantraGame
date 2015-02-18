@@ -30,10 +30,10 @@ echo $this->headScript()
                                 <tr>
                                     <th style="width: 20%;">Draw Time</th>
                                     <th style="width: 15%;">Draw Yantra</th>
-                                    <th style="width: 5%;">P/L</th>
                                     <th style="width: 8%;">Jackpot</th>
                                     <th style="width: 8%;">Purchase</th>
                                     <th style="width: 10%;">Win Price</th>
+                                    <th style="width: 5%;">P/L</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -42,12 +42,12 @@ echo $this->headScript()
                                     foreach ($plReport as $report) {
                                         ?>
                                         <tr>
-                                            <td><?php $date = explode(" ",$report['drawTime']); echo $date[1];?></td>
+                                            <td><?php $date = explode(" ",$report['drawTime']); echo date('h:i a',strtotime($date[1]));?></td>
                                             <td><?=$report['yantraId']?></td>
-                                            <td><?=$report['pl']?></td>
                                             <td><?=$report['jackpot']?></td>
                                             <td><?=$report['purchase']?></td>
                                             <td><?=$report['winPrice']?></td>
+                                            <td><?=$report['pl']?></td>
                                        </tr>
                                         <?php
                                     }

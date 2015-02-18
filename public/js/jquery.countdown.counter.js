@@ -75,7 +75,7 @@ var switchItem = function(itemNumber, digit, capacity) {
 };
 
 var counterFinished = function() {
-    window.location = String(window.location);
+    //swindow.location = String(window.location);
 };
 
 var rollToEnd = function() {
