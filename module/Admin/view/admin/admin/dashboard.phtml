@@ -1,9 +1,13 @@
 <?php
+
+$this->layout('layout/empty');
+
 echo $this->headLink()
         ->appendStylesheet($this->basePath() . '/css/example.css')
         ->appendStylesheet($this->basePath() . '/css/jquery.countdown.timer.css');
 
 echo $this->headScript()
+        ->appendFile($this->basePath() . '/js/bootstrap-toggle.min.js')
         ->appendFile($this->basePath() . '/js/jquery.timeout.interval.idle.js')
         ->appendFile($this->basePath() . '/js/jquery.countdown.counter.js')        
         ->appendFile($this->basePath() . '/js/myjs/dashboard.js');
@@ -11,11 +15,11 @@ echo $this->headScript()
 ?>
 <script>
     $(document).ready(function() {
-        CounterInit(<?php echo $remainigTime; ?>);
+        //CounterInit(<?php echo $remainigTime; ?>);
     });
 </script>
-<div id="page-wrapper">
-    <div class="row">
+<div>
+    <div>
         <div style="width:40%;margin-top:10px;" class="pull-left">
             <b>Selected Mode : <?php if($drawMode['drawMode'] == 1) {
                 echo 'Minimum Mode';
@@ -46,28 +50,9 @@ echo $this->headScript()
             <?php } ?>
                 
         </div>
-        <div id="counter">
-            <div id="counter_item1" class="counter_item">
-                <div class="front"></div>
-                <div class="digit digit0"></div>
-            </div>
-            <div id="counter_item2" class="counter_item">
-                <div class="front"></div>
-                <div class="digit digit0"></div>
-            </div>
-            <div id="counter_item3" class="counter_item">
-                <div class="front"></div>
-                <div class="digit digit_colon"></div>
-            </div>
-            <div id="counter_item4" class="counter_item">
-                <div class="front"></div>
-                <div class="digit digit0"></div>
-            </div>
-            <div id="counter_item5" class="counter_item">
-                <div class="front"></div>
-                <div class="digit digit0"></div>
-            </div>
-        </div>
+        <h1 id="timer">
+            <?php echo $remainigTime; ?>
+        </h1>
         <div class="pull-right" style="margin-top:-87px;">
             <button onclick="refreshTable()" class="btn btn-warning btn-lg pull-left" style="margin-top: 37px;margin-bottom: 18px;margin-right:21px;">
                 Refresh
@@ -141,16 +126,16 @@ echo $this->headScript()
                 </tr>
                 <tr style="color: blue;">
                     <td>P/L</td>
-                    <th id="PL-1"><?php echo isset($rate[1])?$rate[1]['PL']:0; ?></th>
-                    <th id="PL-2"><?php echo isset($rate[2])?$rate[2]['PL']:0; ?></th>
-                    <th id="PL-3"><?php echo isset($rate[3])?$rate[3]['PL']:0; ?></th>
-                    <th id="PL-4"><?php echo isset($rate[4])?$rate[4]['PL']:0; ?></th>
-                    <th id="PL-5"><?php echo isset($rate[5])?$rate[5]['PL']:0; ?></th>
-                    <th id="PL-6"><?php echo isset($rate[6])?$rate[6]['PL']:0; ?></th>
-                    <th id="PL-7"><?php echo isset($rate[7])?$rate[7]['PL']:0; ?></th>
-                    <th id="PL-8"><?php echo isset($rate[8])?$rate[8]['PL']:0; ?></th>
-                    <th id="PL-9"><?php echo isset($rate[9])?$rate[9]['PL']:0; ?></th>
-                    <th id="PL-10"><?php echo isset($rate[10])?$rate[10]['PL']:0; ?></th>
+                    <th id="PL-1"><?php echo isset($rate[1])?$rate[1]['PL']:$totalRate['totalPrice']; ?></th>
+                    <th id="PL-2"><?php echo isset($rate[2])?$rate[2]['PL']:$totalRate['totalPrice']; ?></th>
+                    <th id="PL-3"><?php echo isset($rate[3])?$rate[3]['PL']:$totalRate['totalPrice']; ?></th>
+                    <th id="PL-4"><?php echo isset($rate[4])?$rate[4]['PL']:$totalRate['totalPrice']; ?></th>
+                    <th id="PL-5"><?php echo isset($rate[5])?$rate[5]['PL']:$totalRate['totalPrice']; ?></th>
+                    <th id="PL-6"><?php echo isset($rate[6])?$rate[6]['PL']:$totalRate['totalPrice']; ?></th>
+                    <th id="PL-7"><?php echo isset($rate[7])?$rate[7]['PL']:$totalRate['totalPrice']; ?></th>
+                    <th id="PL-8"><?php echo isset($rate[8])?$rate[8]['PL']:$totalRate['totalPrice']; ?></th>
+                    <th id="PL-9"><?php echo isset($rate[9])?$rate[9]['PL']:$totalRate['totalPrice']; ?></th>
+                    <th id="PL-10"><?php echo isset($rate[10])?$rate[10]['PL']:$totalRate['totalPrice']; ?></th>
                     <td>-</td>
                 </tr>
                 <tr style="color: red;">

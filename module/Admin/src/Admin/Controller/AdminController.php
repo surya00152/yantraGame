@@ -105,7 +105,7 @@ class AdminController extends AbstractActionController
         $currentDateTime  = strtotime($drawDate.' '.$currentTime);
         $drowDateTime = strtotime($drawDate.' '.$myDrawTime);
         $differenceInSeconds = $drowDateTime - $currentDateTime;
-        
+        $differenceInSeconds = date('i:s',$differenceInSeconds);
         if (empty($drawTime)) {
             $drawTime = '00:00:00';
         }

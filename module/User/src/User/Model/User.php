@@ -192,6 +192,7 @@ class User implements ServiceManagerAwareInterface {
                 ->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
     
+       
     /**
      * get Local user By Request Code
      */

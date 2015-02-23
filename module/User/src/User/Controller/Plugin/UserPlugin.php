@@ -16,6 +16,7 @@ use Zend\Db\Adapter\Adapter as DbAdapter;
  */
 class UserPlugin extends AbstractPlugin
 {     
+    protected $signupBal = 100;
     /*
      * Get User Model
      */
@@ -129,7 +130,7 @@ class UserPlugin extends AbstractPlugin
 
             if (count($userData) == 0) {
                 //Generate Password for user
-                $password = $post['phoneNo'];//rand('0000', '999999999');
+                $password = rand('00000', '999999');
                 $userData['phoneNo'] = $post['phoneNo'];
                 $userData['password'] = sha1($password);
                 $userData['name'] = $post['name'];
@@ -137,8 +138,8 @@ class UserPlugin extends AbstractPlugin
                 $userData['userRoll'] = 'local';
                 $userData['deviceType'] = 'Android';
                 $userData['accountStatus'] = 'Active';
-                $userData['avaiPurchaseBal'] = '100';
-                $userData['totalPurchaseBal'] = '100';
+                $userData['avaiPurchaseBal'] = $this->signupBal;
+                $userData['totalPurchaseBal'] = $this->signupBal;
                 $userData['avaiWinBal'] = '0';
                 $userData['totalWinBal'] = '0';
                 $userData['avaiTransBal'] = '0';
@@ -147,7 +148,7 @@ class UserPlugin extends AbstractPlugin
                 $userEntity = $this->getUserModel()->createUser($userData);
                 if ($userEntity->Id > 0) {
 
-                    $message = "Welcome To Jackpot\r\n Hi,".$userData['name']."\r\nYour User Name is:".$userData['phoneNo']." \r\n Your Password is:".$password;
+                    $message = "Welcome To Mobile Yantra Game\r\n Hi,".$userData['name']."\r\nYour User Name is:".$userData['phoneNo']." \r\n Your Password is:".$password;
                     //send SMS to user
                     $this->getAppService()->sendSMS($userData['phoneNo'], $message);
 
@@ -247,7 +248,7 @@ class UserPlugin extends AbstractPlugin
 
             $this->getUserModel()->updateUser($userData['Id'], $updateUserData);
 
-            $message = "Welcome To Yantra Game\r\n Hi,".$userData['name']."\r\nYour verify code is:".$verifyCode;
+            $message = "Welcome To Mobile Yantra Game\r\n Hi,".$userData['name']."\r\nYour verify code is:".$verifyCode;
             //send SMS to user
             $this->getAppService()->sendSMS($userData['phoneNo'], $message);
             
@@ -924,16 +925,18 @@ class UserPlugin extends AbstractPlugin
         $response = array();
         //Get user details By token
         $userData = $this->getUserModel()->getUserByToken($post['token']);
-        //Get Local user details By PhoneNo
-        $localUserData = $this->getUserModel()->getLocalUserByPhoneNo($post['phoneNo']);
+        
         $currentDate = $this->getAppService()->getDate();
         //Check Request
         if ($post['type'] == 'debit') {
+            //Get Local user details By PhoneNo
+            $localUserData = $this->getUserModel()->getLocalUserByPhoneNo($post['phoneNo']);
+            
             if (count($localUserData)) {
                 //check account status
                 if ($localUserData['accountStatus'] == 'Active') {
                     //check request Bal
-                    if ($localUserData['avaiPurchaseBal'] >= $post['balance']) {
+                    if (($localUserData['avaiPurchaseBal'] - $this->signupBal) >= $post['balance']) {
                         //generate bal request code
                         $transferCodeMatch = true;
                         while ($transferCodeMatch == true) {
@@ -984,10 +987,13 @@ class UserPlugin extends AbstractPlugin
                 $response['message'] = $post['phoneNo'].': User not available.';
             }
         } else {
+            //Get Local user details By PhoneNo
+            $localUserData = $this->getUserModel()->getUserByPhoneNo($post['phoneNo']);
             //Transfer credit Balance
             if ($userData['avaiTransBal'] >= $post['balance']) {
                 if (count($localUserData) > 0) {
                     if ($localUserData['accountStatus'] == 'Active') {
+                        
                         //START TRANSACTION
                         $em = $this->getController()->getServiceLocator()->get('doctrine.entitymanager.orm_default');
                         try {
@@ -1010,30 +1016,63 @@ class UserPlugin extends AbstractPlugin
                                 $dateId = $getTicketDate['Id'];
                             }
                             
-                            $localUser = array (
-                                'avaiPurchaseBal' => $post['balance'],
-                                'totalWinBal' => 0,
-                            );
-                            //Update Local user balance.
-                            $this->getUserModel()->updateUserBal($localUserData['Id'],$localUser);
+                            if ($localUserData['userRoll'] == 'local') {
+                                $localUser = array (
+                                    'avaiPurchaseBal' => $post['balance'],
+                                    'totalWinBal' => 0,
+                                );
+                                //Update Local user balance.
+                                $this->getUserModel()->updateUserBal($localUserData['Id'],$localUser);
+                                
+                                $notificationData = array (
+                                    'reqFrom' => $userData['Id'],
+                                    'reqTo' => $localUserData['Id'],
+                                    'requestedName' => $userData['name'],
+                                    'message' => 'Receive chips : '.$post['balance'],
+                                    'date' => $this->getAppService()->getDateTime()
+                                );                            
+                                //set notification message
+                                $this->getNotificationModel()->createNotification($notificationData);
+                            } else {
+                                //check date records exist if not then create new if Yes then use Id
+                                $getLocalTicketDate = $this->getTicketDateModel()->getTicketDate($localUserData['Id'],$currentDate);
                             
+                                if (count($getLocalTicketDate) == 0) {
+                                    //create Date Records
+                                    $dateData  = array (
+                                        'userId' => $localUserData['Id'],
+                                        'drawDate' => $currentDate,
+                                        'openingBal' => $localUserData['avaiTransBal'],
+                                    );
+
+                                    $getLocalDateEntity = $this->getTicketDateModel()->createTicketDate($dateData);
+                                    $localDateId = $getLocalDateEntity->Id;
+                                } else {
+                                    $localDateId = $getLocalTicketDate['Id'];
+                                }
+                                $localUser = array (
+                                    'avaiTransBal' => $localUserData['avaiTransBal'] + $post['balance'],
+                                );
+                                //Update Local user balance.
+                                $this->getUserModel()->updateUser($localUserData['Id'],$localUser);
+                                
+                                $transactionData = array (
+                                    'dateId' => $localDateId,
+                                    'userId' => $userData['Id'],
+                                    'agentId' => $localUserData['Id'],
+                                    'transBalance' => $post['balance'],
+                                    'transType' => 'Debit',
+                                    'time' => $this->getAppService()->getTime()
+                                );
+                                //create Transaction report
+                                $this->getTransactionModel()->createTransaction($transactionData);
+                            }
                             
                             $agentUser = array (
                                 'avaiTransBal' => $userData['avaiTransBal'] - $post['balance'],
                             );
                             //Update Agent user balance.
                             $this->getUserModel()->updateUser($userData['Id'],$agentUser);
-                            
-                            
-                            $notificationData = array (
-                                'reqFrom' => $userData['Id'],
-                                'reqTo' => $localUserData['Id'],
-                                'requestedName' => $userData['name'],
-                                'message' => 'Receive chips : '.$post['balance'],
-                                'date' => $this->getAppService()->getDateTime()
-                            );                            
-                            //set notification message
-                            $this->getNotificationModel()->createNotification($notificationData);
                             
                             $transactionData = array (
                                 'dateId' => $dateId,
@@ -1054,7 +1093,7 @@ class UserPlugin extends AbstractPlugin
                         } catch (\Exception $e) {
                             $em->getConnection()->rollback();
                             $response['status'] = 'error';
-                            $response['message'] = 'Internal Error. Please try agaign.';
+                            $response['message'] = $e->getMessage();//'Internal Error. Please try agaign.';
                         }
                     } else {
                         $response['status'] = 'error';

@@ -12,7 +12,6 @@
                 ->appendStylesheet($this->basePath() . '/dist/css/sb-admin-2.css')
                 ->appendStylesheet($this->basePath() . '/bower_components/morrisjs/morris.css')
                 ->appendStylesheet($this->basePath() . '/bower_components/fontawesome/css/font-awesome.min.css')
-                ->appendStylesheet($this->basePath() . '/css/bootstrap-toggle.min.css')
                 ->appendStylesheet($this->basePath() . '/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css')
                 ->appendStylesheet($this->basePath() . '/bower_components/datatables-responsive/css/dataTables.responsive.css');
 
@@ -25,7 +24,6 @@
                 ->appendFile($this->basePath() . '/bower_components/raphael/raphael-min.js')
                 ->appendFile($this->basePath() . '/bower_components/morrisjs/morris.min.js')
                 ->appendFile($this->basePath() . '/dist/js/sb-admin-2.js')
-                ->appendFile($this->basePath() . '/js/bootstrap-toggle.min.js')
                 ->appendFile($this->basePath() . '/bower_components/datatables/media/js/jquery.dataTables.min.js')
                 ->appendFile($this->basePath() . '/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js');
         ?>
@@ -75,7 +73,7 @@
                                 <a href="<?php echo $this->basePath() ?>/admin/home"><i class="fa fa-home fa-fw"></i> Home</a>
                             </li>
                             <li>
-                                <a href="<?php echo $this->basePath() ?>/admin/dashboard"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                                <a href="<?php echo $this->basePath() ?>/admin/dashboard" target="_new"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                             </li>
                             <li>
                                 <a href="javascript:void(0);"><i class="fa fa-users fa-fw"></i> Users<span class="fa arrow"></span></a>
