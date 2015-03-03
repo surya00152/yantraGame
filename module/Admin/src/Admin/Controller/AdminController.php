@@ -475,11 +475,11 @@ class AdminController extends AbstractActionController
         
         $post['date'] = !empty($post['date'])?$post['date']:$this->userPlugin()->getAppService()->getDate();
         
-        if (count($post) > 0) {
-                           
+        if (count($post) > 0) {                           
             //Get Purchase report By UserId
             $data['plReport'] = $this->userPlugin()->getDrowModel()->getAllDrowYantra($post['date'],null);
-            
+            $lastIndex = count($data['plReport']);
+            unset($data['plReport'][$lastIndex - 1]);
         } else {
             $this->flashMessenger()->setNamespace('error');
             $this->flashMessenger()->addMessage('Post Data Invalid.');

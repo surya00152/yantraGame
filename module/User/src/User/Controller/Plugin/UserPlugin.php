@@ -348,6 +348,26 @@ class UserPlugin extends AbstractPlugin
         if (count($userData) > 0) {
             //check User Roll.
             if ($userData['userRoll'] == 'local') {
+                /***TIME VALIDATION**/
+                $dashboardTime = $this->getAppService()->getUserDashboardTime();
+                $currentDate = $this->getAppService()->getDate();
+                $drowTime = $this->getAppService()->getDrawTime();
+                if (empty($drowTime)) {
+                    $drowTime = '24:00:00';
+                }
+                
+                $realDate = new \DateTime($currentDate.' '.$dashboardTime);
+                $realDate->modify("+1 min");  
+                $realDate = $realDate->format('Y-m-d H:i:s');
+
+                $compareDrawDate = new \DateTime($currentDate.' '.$drowTime);
+                $compareDrawDate = $compareDrawDate->format('Y-m-d H:i:s');            
+
+                if (strtotime($realDate) > strtotime($compareDrawDate)) {
+                    $response['status'] = 'waiting';
+                    return $response;
+                }
+                /***TIME VALIDATION**/
                 $dashTime = $this->getAppService()->getUserDashboardTime();
                 $time = $this->getAppService()->getDrawTime($dashTime);
                 if(empty($time)) {

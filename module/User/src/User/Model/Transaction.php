@@ -74,18 +74,24 @@ class Transaction implements ServiceManagerAwareInterface {
      * get Transaction Daywise report
      */
     public function getAdminTransactionDaywiseReport($adminId = 1,$startDate,$endDate) {
-        $qb = $this->entityManager->createQueryBuilder();
-        return $qb->select("dt.drawDate,(SELECT SUM(tc.transBalance) FROM ".self::ENTITY." tc WHERE tc.transType = 'Credit' AND tc.dateId = dt.Id AND (tc.agentId=1 OR tc.userId=1) GROUP BY dt.drawDate ) as creditBal,(SELECT SUM(td.transBalance) FROM ".self::ENTITY." td WHERE td.transType = 'Debit' AND td.dateId = dt.Id AND (td.agentId=1 OR td.userId=1) GROUP BY dt.drawDate) as debitBal")
-                ->from(self::ENTITY, 't')
-                ->leftJoin(self::USERENTITY, 'ul','with', 't.userId = ul.Id')
-                ->leftJoin(self::USERENTITY, 'ug','with', 't.agentId = ug.Id')
-                ->leftJoin(self::DATEENTITY, 'dt','with', 't.dateId = dt.Id')
-                ->where('dt.drawDate >='.$qb->expr()->literal($startDate))
-                ->andWhere('dt.drawDate <='.$qb->expr()->literal($endDate))
-                ->andWhere('t.agentId ='.$adminId.' OR t.userId ='.$adminId)
-                ->groupBy('dt.drawDate')
-                ->getQuery()
-                ->getArrayResult();
+        
+        $stmt = $this->entityManager->getConnection()
+                    ->prepare("SELECT d0_.drawDate AS drawDate, SUM((SELECT SUM(t1_.transBalance) AS dctrn__1 FROM transaction t1_ WHERE t1_.transType = 'Credit' AND t1_.dateId = d0_.Id AND (t1_.agentId = 1 OR t1_.userId = 1) GROUP BY d0_.drawDate)) as creditBal, SUM((SELECT SUM(t2_.transBalance) AS dctrn__2 FROM transaction t2_ WHERE t2_.transType = 'Debit' AND t2_.dateId = d0_.Id AND (t2_.agentId = 1 OR t2_.userId = 1) GROUP BY d0_.drawDate)) as debitBal FROM transaction t3_ LEFT JOIN users u4_ ON (t3_.userId = u4_.Id) LEFT JOIN users u5_ ON (t3_.agentId = u5_.Id) LEFT JOIN date d0_ ON (t3_.dateId = d0_.Id) WHERE d0_.drawDate >= '$startDate' AND d0_.drawDate <= '$endDate' AND (t3_.agentId = 1 OR t3_.userId = 1) GROUP BY d0_.drawDate");
+        $stmt->execute();
+        return $stmt->fetchAll();
+//        echo '<pre>';print_r($result);exit;
+//        $qb = $this->entityManager->createQueryBuilder();
+//        return $qb->select("dt.drawDate,SUM(SELECT SUM(tc.transBalance) FROM ".self::ENTITY." tc WHERE tc.transType = 'Credit' AND tc.dateId = dt.Id AND (tc.agentId=1 OR tc.userId=1) GROUP BY dt.drawDate ) as creditBal,SUM(SELECT SUM(td.transBalance) FROM ".self::ENTITY." td WHERE td.transType = 'Debit' AND td.dateId = dt.Id AND (td.agentId=1 OR td.userId=1) GROUP BY dt.drawDate) as debitBal")
+//                ->from(self::ENTITY, 't')
+//                ->leftJoin(self::USERENTITY, 'ul','with', 't.userId = ul.Id')
+//                ->leftJoin(self::USERENTITY, 'ug','with', 't.agentId = ug.Id')
+//                ->leftJoin(self::DATEENTITY, 'dt','with', 't.dateId = dt.Id')
+//                ->where('dt.drawDate >='.$qb->expr()->literal($startDate))
+//                ->andWhere('dt.drawDate <='.$qb->expr()->literal($endDate))
+//                ->andWhere('t.agentId ='.$adminId.' OR t.userId ='.$adminId)
+//                ->groupBy('dt.drawDate')
+//                ->getQuery()
+//                ->getArrayResult();
     
     }
     

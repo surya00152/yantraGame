@@ -1,24 +1,26 @@
 $(document).ready(function() {
     
-    $("#createAgentFrm").validate({
-        submitHandler: function(form) {
-            return true;
-        },
-        rules: {
-            phoneNo: {number:true,
-                required:true,
-                minlength: 6,
-                maxlength: 10},
-            password: {required: true}
-        },
-        messages: {
-            phoneNo: {required: "Please Enter Agent Id.",
-                number: "Agent Id Allow ony numeric value.",
-                minlength: "Please enter at least 6 digits no.",
-                maxlength: "Agent Id is to long."},
-            password: {required: "Please Enter Password."}
-        }
-    });
+    if ($("#createAgentFrm").length > 0) {
+        $("#createAgentFrm").validate({
+            submitHandler: function(form) {
+                form.submit();
+            },
+            rules: {
+                phoneNo: {number:true,
+                    required:true,
+                    minlength: 6,
+                    maxlength: 10},
+                password: {required: true}
+            },
+            messages: {
+                phoneNo: {required: "Please Enter Agent Id.",
+                    number: "Agent Id Allow ony numeric value.",
+                    minlength: "Please enter at least 6 digits no.",
+                    maxlength: "Agent Id is to long."},
+                password: {required: "Please Enter Password."}
+            }
+        });
+    }
     
     $(".confirm").button().click(function(e) {
         e.preventDefault();
